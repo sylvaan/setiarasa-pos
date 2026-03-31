@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">SetiaRasa</string>
-    <string name="title_activity_main">SetiaRasa</string>
+    <string name="app_name">SetiaRasa POS</string>
+    <string name="title_activity_main">SetiaRasa POS</string>
     <string name="package_name">com.setiarasa.pos</string>
     <string name="custom_url_scheme">com.setiarasa.pos</string>
 </resources>

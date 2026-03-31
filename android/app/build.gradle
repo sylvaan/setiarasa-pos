@@ -22,6 +22,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    // Ganti nama output APK
+    setProperty("archivesBaseName", "setiarasa-pos")
 }
 
 repositories {
