@@ -94,27 +94,62 @@ export default function App() {
   }, [orders, analyticsRange])
 
   const salesTrend = useMemo(() => {
-    const last8Hours = [...Array(8)].map((_, i) => {
-      const d = new Date()
-      d.setHours(d.getHours() - (7 - i), 0, 0, 0)
-      return {
-        label: d.getHours() + ':00',
-        timestamp: d.getTime(),
-        amount: 0
-      }
-    })
+    let buckets: { label: string, timestamp: number, amount: number, isToday?: boolean }[] = []
+    const now = new Date()
+
+    if (analyticsRange === 'today') {
+      // Last 8 Hours
+      buckets = [...Array(8)].map((_, i) => {
+        const d = new Date(now)
+        d.setHours(now.getHours() - (7 - i), 0, 0, 0)
+        return {
+          label: i === 7 ? 'Sekarang' : d.getHours() + ':00',
+          timestamp: d.getTime(),
+          amount: 0,
+          isToday: i === 7
+        }
+      })
+    } else if (analyticsRange === 'week') {
+      // Last 7 Days
+      buckets = [...Array(7)].map((_, i) => {
+        const d = new Date(now)
+        d.setDate(now.getDate() - (6 - i))
+        d.setHours(0, 0, 0, 0)
+        const isToday = d.toDateString() === now.toDateString()
+        return {
+          label: isToday ? 'Hari Ini' : d.toLocaleDateString('id-ID', { weekday: 'short' }),
+          timestamp: d.getTime(),
+          amount: 0,
+          isToday
+        }
+      })
+    } else if (analyticsRange === 'month') {
+      // Last 30 Days
+      buckets = [...Array(30)].map((_, i) => {
+        const d = new Date(now)
+        d.setDate(now.getDate() - (29 - i))
+        d.setHours(0, 0, 0, 0)
+        const isToday = d.toDateString() === now.toDateString()
+        return {
+          label: d.getDate().toString(),
+          timestamp: d.getTime(),
+          amount: 0,
+          isToday
+        }
+      })
+    }
 
     orders.forEach(order => {
       const orderTime = new Date(order.timestamp).getTime()
-      const bucket = last8Hours.find((h, i) => {
-        const nextTime = last8Hours[i+1]?.timestamp || Infinity
+      const bucket = buckets.find((h, i) => {
+        const nextTime = buckets[i + 1]?.timestamp || Infinity
         return orderTime >= h.timestamp && orderTime < nextTime
       })
       if (bucket) bucket.amount += order.totalAmount
     })
 
-    return last8Hours
-  }, [orders])
+    return buckets
+  }, [orders, analyticsRange])
 
   const filteredProducts = MOCK_PRODUCTS.filter(p => p.category === selectedCategory)
   const activeDough = DOUGH_OPTIONS.find(d => d.id === selectedDoughId) || DOUGH_OPTIONS[0]
@@ -360,14 +395,14 @@ export default function App() {
                             <polyline
                               fill="none"
                               stroke="#10b981"
-                              strokeWidth="2"
+                              strokeWidth={analyticsRange === 'month' ? "1.5" : "2"}
                               strokeLinecap="round"
                               strokeLinejoin="round"
                               points={points}
                               className="transition-all duration-1000"
                             />
-                            {/* Points */}
-                            {salesTrend.map((t, i) => (
+                            {/* Points - Hidden in month view for cleanliness */}
+                            {analyticsRange !== 'month' && salesTrend.map((t, i) => (
                               <circle
                                 key={i}
                                 cx={(i / (salesTrend.length - 1)) * 100}
@@ -385,8 +420,20 @@ export default function App() {
                     
                     {/* X-Axis Labels */}
                     <div className="flex justify-between mt-4">
-                      {salesTrend.filter((_, i) => i % 2 === 0).map((t, i) => (
-                        <span key={i} className="text-[8px] font-black text-slate-400 uppercase">{t.label}</span>
+                      {salesTrend.filter((_, i) => {
+                        if (analyticsRange === 'today') return i % 2 === 0 || i === salesTrend.length - 1
+                        if (analyticsRange === 'week') return true
+                        return i % 5 === 0 || i === salesTrend.length - 1
+                      }).map((t, i) => (
+                        <span 
+                          key={i} 
+                          className={cn(
+                            "text-[8px] font-black uppercase tracking-tighter",
+                            t.isToday ? "text-emerald-600" : "text-slate-500"
+                          )}
+                        >
+                          {t.label}
+                        </span>
                       ))}
                     </div>
                   </div>
