@@ -32,3 +32,14 @@ export interface CATEGORY {
   name: string
   icon: string
 }
+
+export interface Expense {
+  id: string
+  timestamp: string
+  title: string
+  amount: number
+  category: string
+}
+
+export type StaffView = 'pos' | 'expenses'
+export type OwnerView = 'overview' | 'sales' | 'history'

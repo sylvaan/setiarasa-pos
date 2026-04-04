@@ -1,15 +1,18 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { Product, DoughOption, CartItem, Order } from '../types'
+import type { Product, DoughOption, CartItem, Order, Expense } from '../types'
 
 interface CartStore {
   items: CartItem[]
   orders: Order[]
+  expenses: Expense[]
   addItem: (product: Product, selectedDough?: DoughOption) => void
   removeItem: (itemId: string) => void // itemId is productId + doughId
   clearCart: () => void
   getTotal: () => number
   checkout: () => void
+  addExpense: (title: string, amount: number, category: string) => void
+  removeExpense: (expenseId: string) => void
 }
 
 const calculateItemPrice = (product: Product, selectedDough?: DoughOption) => {
@@ -28,6 +31,7 @@ export const useCartStore = create<CartStore>()(
     (set, get) => ({
       items: [],
       orders: [],
+      expenses: [],
       addItem: (product, selectedDough) => set((state) => {
         const doughId = selectedDough?.id || 'none'
         const itemId = `${product.id}-${doughId}`
@@ -83,8 +87,20 @@ export const useCartStore = create<CartStore>()(
           orders: [newOrder, ...state.orders],
           items: []
         }))
-      }
+      },
+      addExpense: (title, amount, category) => set((state) => ({
+        expenses: [{
+          id: `EX-${Date.now()}`,
+          timestamp: new Date().toISOString(),
+          title,
+          amount,
+          category
+        }, ...state.expenses]
+      })),
+      removeExpense: (expenseId) => set((state) => ({
+        expenses: state.expenses.filter(ex => ex.id !== expenseId)
+      }))
     }),
-    { name: 'setiarasa-cart-v2' } // Bump version due to structural change
+    { name: 'setiarasa-cart-v3' } // Bump version due to structural change
   )
 )
