@@ -1,37 +1,36 @@
-# 🥯 SetiaRasa POS (Mobile-First Modern UI)
+# Martabak SetiaRasa Lebaksiu
 
-SetiaRasa POS is a high-performance, mobile-first Point of Sale application designed for artisanal food businesses like "Martabak Setia Rasa". Built with a focus on an elegant **Sky Blue Aesthetic** and a seamless **"Klik-Klik" (One-Tap)** workflow, it allows staff to record sales instantly while providing owners with real-time analytics.
+A mobile-first Point of Sale (POS) application built for **Martabak SetiaRasa Lebaksiu**, with a focus on ease of use and real-time sales tracking.
 
-## ✨ Key Features
+## Core Features
 
-### 🛒 Staff Mode (Sales Workflow)
-- **Ultra-Fast Ordering**: Optimized for touch inputs with large, beautiful cards.
-- **Dynamic Variants**: Support for dough selection (Original, Pandan, Black Forest) with immediate pricing updates.
-- **Smart Cart**: Persistent shopping cart powered by **Zustand** that remembers orders even if the page is refreshed.
-- **Animated Checkout**: Smooth transitions and clear feedback for every action.
+### Staff Mode
+- **Order Management**: Interface for quick product selection and cart management.
+- **Product Variants**: Support for different dough options (Original, Pandan, etc.) with automatic price adjustments.
+- **Persistent Cart**: Local state persistence and order handling using Zustand.
+- **Checkout Workflow**: Step-by-step process for completing transactions and recording sales.
 
-### 🛡️ Owner Mode (Business Intelligence)
-- **PIN Protected Access**: Secure owner-only dashboard guarded by a 6-digit PIN.
-- **Real-Time Stats**: Daily sales revenue and total order count at a glance.
-- **Sales Trends**: Animated SVG charts showing sales velocity over the last 8 hours.
-- **Menu Popularity**: Visual ranking of best-selling items (Today, This Week, This Month).
-- **History Viewer**: Detailed record of daily transactions with unique order IDs.
+### Owner Mode
+- **Access Control**: Authentication via a 6-digit PIN for sensitive data access.
+- **Sales Analytics**: Overview of daily revenue, order counts, and net profit (Gross Sales - Expenses).
+- **Trends & Charts**: Visual representation of sales trends and product popularity over Day, Week, and Month periods.
+- **Record Keeping**: Transaction history and expense logging for basic business accounting.
 
-## 🚀 Tech Stack
+## Tech Stack
 - **Frontend**: React 19 + Vite 6
-- **Styling**: Tailwind CSS v4 (Glassmorphism & Custom UI)
+- **Styling**: Tailwind CSS v4
 - **State Management**: Zustand (with Persist Middleware)
 - **Animations**: Framer Motion
 - **Icons**: Lucide React
 
-## 🛠️ Getting Started
+## Getting Started
 
 ### Prerequisites
-- [Node.js](https://nodejs.org/) (v18+)
-- [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
+- Node.js (v18+)
+- npm or yarn
 
 ### Installation
-1. Clone this repository
+1. Clone the repository.
 2. Install dependencies:
    ```bash
    npm install
@@ -45,11 +44,10 @@ SetiaRasa POS is a high-performance, mobile-first Point of Sale application desi
    npm run build
    ```
 
-## 🎨 Design Philosophy
-The UI is built on a **"Sky Blue & Glass"** aesthetic:
-- **Translucent Overlays**: Utilizing backdrop-blur for a modern, depth-focused feel.
-- **High-Contrast Typography**: Using bold, black italic accents for a premium, fast-paced brand vibe.
-- **Tactile Feedback**: Responsive hover and active states for a "native app" experience on mobile.
+## Design and Architecture
+- **Component-Based**: Modular structure separating POS, Expenses, and Dashboard logic.
+- **Responsive Design**: Designed specifically for small-screen mobile devices.
+- **State Persistence**: Uses browser's local storage for data durability across sessions.
 
 ---
-*Built with ❤️ for SetiaRasa Martabak.*
+*Developed for Martabak SetiaRasa Lebaksiu.*
