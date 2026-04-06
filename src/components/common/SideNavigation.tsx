@@ -265,7 +265,7 @@ export const SideNavigation = ({
                 </div>
               )}
               <p className="!text-center !text-[8px] !text-slate-300 !mt-4 !uppercase !tracking-[0.2em] !font-medium">
-                Martabak SetiaRasa &bull; v1.0.4
+                Martabak SetiaRasa &bull; v1.0.5
               </p>
             </div>
           </motion.div>

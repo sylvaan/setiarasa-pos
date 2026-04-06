@@ -1,4 +1,4 @@
-# Martabak SetiaRasa Lebaksiu (v1.0.4)
+# Martabak SetiaRasa Lebaksiu (v1.0.5)
 
 A mobile-first Point of Sale (POS) application and business dashboard built for **Martabak SetiaRasa Lebaksiu**, focusing on operational efficiency, cloud-synced financial reporting, and owner-centric analytics.
 

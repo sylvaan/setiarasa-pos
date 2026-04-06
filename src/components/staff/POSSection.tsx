@@ -37,7 +37,7 @@ export const POSSection = ({
               key={cat.id}
               onClick={() => setSelectedCategory(cat.id)}
               className={cn(
-                "flex-none flex items-center gap-4 !p-[10px] rounded-[2.5rem] font-bold transition-all duration-500 border-2 snap-start min-w-[130px] justify-center flex-col shadow-sm relative group",
+                "flex-none flex items-center gap-4 !p-[10px] rounded-[2.5rem] font-bold transition-all duration-500 border-2 snap-start min-w-[130px] justify-center flex-col shadow-sm relative group outline-none",
                 isActive 
                   ? isManis
                     ? "!bg-emerald-500 !text-white !border-emerald-400 !shadow-[0_20px_40px_-10px_rgba(16,185,129,0.4)] !scale-110"
@@ -80,6 +80,7 @@ export const POSSection = ({
                 key={product.id}
                 product={product}
                 idx={idx}
+                isBestSeller={idx < 2 && (product.salesCount || 0) > 0}
                 cartItem={totalQty > 0 ? { quantity: totalQty } : undefined}
                 onClick={() => onProductClick(product)}
               />

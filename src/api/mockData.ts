@@ -1,10 +1,17 @@
-import type { Product, DoughOption } from "../types";
+import type { Product, DoughOption, ToppingOption } from "../types";
 
 export const DOUGH_OPTIONS: DoughOption[] = [
   { id: "original", label: "Original", extraPrice: 0 },
   { id: "pandan", label: "Pandan", extraPrice: 2000 },
   { id: "red_velvet", label: "Red Velvet", extraPrice: 2000 },
   { id: "black_forest", label: "Black Forest", extraPrice: 2000 }
+];
+
+export const MOCK_TOPPINGS: ToppingOption[] = [
+  { id: "t_keju", label: "Keju", price: 3000 },
+  { id: "t_cokelat", label: "Cokelat", price: 2000 },
+  { id: "t_kacang", label: "Kacang", price: 2000 },
+  { id: "t_wijen", label: "Wijen", price: 2000 },
 ];
 
 export const MOCK_PRODUCTS: Product[] = [

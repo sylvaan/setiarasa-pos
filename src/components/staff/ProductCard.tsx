@@ -1,58 +1,108 @@
-import { motion } from 'framer-motion'
-import { Plus } from 'lucide-react'
-import type { Product } from '../../types'
-import { clsx, type ClassValue } from 'clsx'
-import { twMerge } from 'tailwind-merge'
+import { motion } from "framer-motion";
+import { Plus, Crown } from "lucide-react";
+import type { Product } from "../../types";
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+import Card from "../ui/Card";
+import { Heading, Subheading, Label } from "../ui/Typography";
 
 function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 interface ProductCardProps {
-  product: Product
-  idx: number
-  cartItem?: { quantity: number }
-  onClick: () => void
+  product: Product;
+  idx: number;
+  cartItem?: { quantity: number };
+  isBestSeller?: boolean;
+  onClick: () => void;
 }
 
-export const ProductCard = ({ product, idx, cartItem, onClick }: ProductCardProps) => {
+export const ProductCard = ({
+  product,
+  idx,
+  cartItem,
+  isBestSeller,
+  onClick,
+}: ProductCardProps) => {
+  const isManis = product.category === "manis";
+  const accentColor = isManis ? "emerald" : "amber";
+
   return (
-    <motion.div
+    <Card
       layout
+      variant={cartItem ? "white" : "glass"}
+      padding="none"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: idx * 0.05 }}
       onClick={onClick}
+      hoverScale
       className={cn(
-        "relative glass-card text-left flex flex-col justify-between min-h-[160px] group shadow-md hover:shadow-lg transition-all p-4 rounded-[2rem] active:scale-95 cursor-pointer border",
-        cartItem 
-          ? product.category === 'manis' 
-            ? "!bg-emerald-100/90 !border-none" 
-            : "!bg-amber-100/90 !border-none"
-          : "bg-white/60 border-white/80"
+        "!text-left !flex !flex-col !justify-between min-h-[160px] !p-4 !rounded-[2rem] active:scale-95 cursor-pointer !border",
+        cartItem
+          ? isManis
+            ? "!bg-emerald-100/90 !border-emerald-200"
+            : "!bg-amber-100/90 !border-amber-200"
+          : "!bg-white/60 !border-white/80",
       )}
     >
-      <div className="space-y-1.5">
-        <p className="text-slate-500 text-[9px] uppercase font-bold tracking-widest opacity-60">
-          {product.category === 'telor' ? product.eggType : product.category}
-        </p>
-        <h3 className="text-sm font-bold leading-snug group-hover:text-emerald-600 transition-colors uppercase italic text-slate-900 line-clamp-2">
-          {product.name}
-        </h3>
-      </div>
-      
-      <div className="flex justify-between items-end mt-4 pt-3 border-t border-slate-200/50">
-        <div className="flex flex-col">
-          <span className="text-[10px] font-bold text-slate-400 uppercase opacity-70">Mulai</span>
-          <p className="font-bold text-amber-600 text-lg leading-none">Rp {(product.basePrice / 1000).toFixed(0)}k</p>
+      {isBestSeller && (
+        <div className="absolute top-3 right-3 !px-2.5 !py-1 !bg-amber-500 rounded-full flex items-center gap-1 shadow-lg border border-white/30 z-20">
+          <Crown className="!text-white !fill-white" size={10} />
+          <span className="text-[7px] font-black tracking-widest !text-white uppercase">
+            Best Seller
+          </span>
         </div>
-        <div className="bg-emerald-600 text-white !p-[10px] rounded-xl shadow-lg transition-transform group-active:scale-90">
-           <Plus size={16} strokeWidth={3} />
+      )}
+
+      <div className="!space-y-1.5">
+        <Label className="!opacity-60">
+          {product.category === "telor" ? product.eggType : product.category}
+        </Label>
+        <Heading
+          as="h3"
+          className={cn(
+            "!text-sm !not-italic !tracking-normal group-hover:text-emerald-600 transition-colors !line-clamp-2",
+            cartItem ? "text-slate-900" : "text-slate-800",
+          )}
+        >
+          {product.name}
+        </Heading>
+      </div>
+
+      <div
+        className={cn(
+          "!flex !justify-between !items-end !mt-4 !pt-3 !border-t transition-colors",
+          cartItem ? "border-slate-300/50" : "border-slate-200/50",
+        )}
+      >
+        <div className="!flex !flex-col">
+          {isManis && (
+            <Subheading className="!text-[10px] !opacity-70">Mulai</Subheading>
+          )}
+          <Heading
+            as="p"
+            className={cn(
+              "!text-lg !leading-none",
+              accentColor === "emerald" ? "text-emerald-700" : "text-amber-700",
+            )}
+          >
+            Rp {Number((product.basePrice / 1000).toFixed(1))}k
+          </Heading>
+        </div>
+        <div
+          className={cn(
+            "bg-emerald-600 text-white !p-2 rounded-xl shadow-lg transition-transform group-active:scale-90",
+            accentColor === "amber" && "!bg-amber-600",
+          )}
+        >
+          <Plus size={16} strokeWidth={3} />
         </div>
       </div>
 
       {cartItem && (
-        <motion.div 
+        <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           className="absolute -top-3 -right-3 bg-emerald-600 text-white w-8 h-8 flex items-center justify-center rounded-full text-xs font-bold shadow-lg border-4 border-sky-100 z-10"
@@ -60,6 +110,6 @@ export const ProductCard = ({ product, idx, cartItem, onClick }: ProductCardProp
           {cartItem.quantity}
         </motion.div>
       )}
-    </motion.div>
-  )
-}
+    </Card>
+  );
+};
