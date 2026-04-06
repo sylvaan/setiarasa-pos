@@ -1,29 +1,46 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { Product, DoughOption, CartItem, Order, Expense } from '../types'
+import type { Product, DoughOption, ToppingOption, CartItem, Order, Expense } from '../types'
+import { IS_PROD } from '../lib/config'
+import { supabase, syncOrder, syncExpense } from '../lib/supabase'
+import { MOCK_PRODUCTS, DOUGH_OPTIONS, MOCK_TOPPINGS } from '../api/mockData'
 
 interface CartStore {
   items: CartItem[]
   orders: Order[]
   expenses: Expense[]
-  addItem: (product: Product, selectedDough?: DoughOption) => void
-  removeItem: (itemId: string) => void // itemId is productId + doughId
+  products: Product[]
+  doughOptions: DoughOption[]
+  toppingOptions: ToppingOption[]
+  isSyncing: boolean
+  addItem: (product: Product, selectedDough?: DoughOption, selectedToppings?: ToppingOption[]) => void
+  removeItem: (itemId: string) => void // itemId is productId + doughId + toppingIds
   clearCart: () => void
   getTotal: () => number
-  checkout: () => void
-  addExpense: (title: string, amount: number, category: string) => void
+  checkout: () => Promise<void>
+  addExpense: (title: string, amount: number, category: string) => Promise<void>
   removeExpense: (expenseId: string) => void
+  fetchInitialData: () => Promise<void>
+  fetchProducts: () => Promise<void>
+  fetchDoughOptions: () => Promise<void>
+  fetchToppingOptions: () => Promise<void>
+  fetchOwnerData: () => Promise<void>
+  verifyOwnerPin: (pin: string) => Promise<boolean>
 }
 
-const calculateItemPrice = (product: Product, selectedDough?: DoughOption) => {
+const calculateItemPrice = (product: Product, selectedDough?: DoughOption, selectedToppings?: ToppingOption[]) => {
   const basePrice = product.basePrice
-  const extraPrice = selectedDough?.extraPrice || 0
+  const doughPrice = selectedDough?.extraPrice || 0
+  const toppingsPrice = selectedToppings?.reduce((sum, t) => sum + t.price, 0) || 0
   
-  if (product.isSpecialExtra && extraPrice > 0) {
-    // Kalau Keju Susu dan bukan Original (extraPrice > 0), cuma tambah 1000
-    return basePrice + 1000
+  let finalBasePlusDough = basePrice + doughPrice
+  
+  if (product.isSpecialExtra && doughPrice > 0) {
+    // Kalau Keju Susu (m7) dan bukan Original, cuma tambah 1000 untuk adonan
+    finalBasePlusDough = basePrice + 1000
   }
-  return basePrice + extraPrice
+  
+  return finalBasePlusDough + toppingsPrice
 }
 
 export const useCartStore = create<CartStore>()(
@@ -32,47 +49,77 @@ export const useCartStore = create<CartStore>()(
       items: [],
       orders: [],
       expenses: [],
-      addItem: (product, selectedDough) => set((state) => {
+      products: MOCK_PRODUCTS, // Default to Mock
+      doughOptions: DOUGH_OPTIONS, // Default to Mock
+      toppingOptions: MOCK_TOPPINGS,
+      isSyncing: false,
+      addItem: (product, selectedDough, selectedToppings = []) => set((state) => {
         const doughId = selectedDough?.id || 'none'
-        const itemId = `${product.id}-${doughId}`
+        const toppingIds = selectedToppings.map(t => t.id).sort().join(',')
+        const itemId = `${product.id}-${doughId}-${toppingIds || 'no-extra'}`
         
-        const existing = state.items.find((i) => `${i.id}-${i.selectedDough?.id || 'none'}` === itemId)
-        const price = calculateItemPrice(product, selectedDough)
+        const existing = state.items.find((i) => {
+          const iDoughId = i.selectedDough?.id || 'none'
+          const iToppingIds = i.selectedToppings?.map(t => t.id).sort().join(',') || 'no-extra'
+          return i.id === product.id && iDoughId === doughId && iToppingIds === (toppingIds || 'no-extra')
+        })
+
+        const price = calculateItemPrice(product, selectedDough, selectedToppings)
 
         if (existing) {
           return {
-            items: state.items.map((i) => 
-              `${i.id}-${i.selectedDough?.id || 'none'}` === itemId 
+            items: state.items.map((i) => {
+              const iDoughId = i.selectedDough?.id || 'none'
+              const iToppingIds = i.selectedToppings?.map(t => t.id).sort().join(',') || 'no-extra'
+              const currentId = `${i.id}-${iDoughId}-${iToppingIds}`
+              
+              return currentId === itemId 
                 ? { ...i, quantity: i.quantity + 1, totalItemPrice: price } 
                 : i
-            )
+            })
           }
         }
         
         const newItem: CartItem = {
           ...product,
           selectedDough,
+          selectedToppings,
           quantity: 1,
           totalItemPrice: price
         }
         return { items: [...state.items, newItem] }
       }),
       removeItem: (itemId) => set((state) => {
-        const existing = state.items.find((i) => `${i.id}-${i.selectedDough?.id || 'none'}` === itemId)
+        const existing = state.items.find((i) => {
+          const iDoughId = i.selectedDough?.id || 'none'
+          const iToppingIds = i.selectedToppings?.map(t => t.id).sort().join(',') || 'no-extra'
+          return `${i.id}-${iDoughId}-${iToppingIds}` === itemId
+        })
+
         if (existing && existing.quantity > 1) {
           return {
-            items: state.items.map((i) => 
-              `${i.id}-${i.selectedDough?.id || 'none'}` === itemId 
+            items: state.items.map((i) => {
+              const iDoughId = i.selectedDough?.id || 'none'
+              const iToppingIds = i.selectedToppings?.map(t => t.id).sort().join(',') || 'no-extra'
+              const currentId = `${i.id}-${iDoughId}-${iToppingIds}`
+              
+              return currentId === itemId 
                 ? { ...i, quantity: i.quantity - 1 } 
                 : i
-            )
+            })
           }
         }
-        return { items: state.items.filter((i) => `${i.id}-${i.selectedDough?.id || 'none'}` !== itemId) }
+        return { 
+          items: state.items.filter((i) => {
+            const iDoughId = i.selectedDough?.id || 'none'
+            const iToppingIds = i.selectedToppings?.map(t => t.id).sort().join(',') || 'no-extra'
+            return `${i.id}-${iDoughId}-${iToppingIds}` !== itemId
+          }) 
+        }
       }),
       clearCart: () => set({ items: [] }),
       getTotal: () => get().items.reduce((acc, item) => acc + (item.totalItemPrice * item.quantity), 0),
-      checkout: () => {
+      checkout: async () => {
         const { items, getTotal } = get()
         if (items.length === 0) return
 
@@ -83,24 +130,160 @@ export const useCartStore = create<CartStore>()(
           totalAmount: getTotal()
         }
 
+        set({ isSyncing: true })
+        
+        // Sync if Production
+        if (IS_PROD && supabase) {
+          await syncOrder(newOrder)
+          
+          // Increment sales count for each product in the order
+          for (const item of items) {
+             const { error } = await supabase.rpc('increment_sales', { prod_id: item.id, qty: item.quantity })
+             
+             // Fallback if RPC doesn't exist
+             if (error) {
+                const { data } = await supabase.from('products').select('sales_count').eq('id', item.id).single()
+                if (data) {
+                  await supabase.from('products').update({ sales_count: (data.sales_count || 0) + item.quantity }).eq('id', item.id)
+                }
+             }
+          }
+        }
+
         set((state) => ({
           orders: [newOrder, ...state.orders],
-          items: []
+          items: [],
+          isSyncing: false
         }))
       },
-      addExpense: (title, amount, category) => set((state) => ({
-        expenses: [{
+      addExpense: async (title, amount, category) => {
+        const newExpense: Expense = {
           id: `EX-${Date.now()}`,
           timestamp: new Date().toISOString(),
           title,
           amount,
           category
-        }, ...state.expenses]
-      })),
+        }
+
+        set({ isSyncing: true })
+        if (IS_PROD) {
+          await syncExpense(newExpense)
+        }
+
+        set((state) => ({
+          expenses: [newExpense, ...state.expenses],
+          isSyncing: false
+        }))
+      },
       removeExpense: (expenseId) => set((state) => ({
         expenses: state.expenses.filter(ex => ex.id !== expenseId)
-      }))
+      })),
+      fetchInitialData: async () => {
+        if (!IS_PROD || !supabase) return
+        
+        get().fetchProducts()
+        get().fetchDoughOptions()
+        get().fetchToppingOptions()
+        // REMOVED: No more fetching orders/expenses here for security
+      },
+      fetchOwnerData: async () => {
+        if (!IS_PROD || !supabase) return
+        
+        const { data: ords } = await supabase.from('orders').select('*').order('timestamp', { ascending: false }).limit(100)
+        const { data: exps } = await supabase.from('expenses').select('*').order('timestamp', { ascending: false }).limit(100)
+        
+        if (ords) {
+          set({ 
+            orders: ords.map(o => ({
+              ...o,
+              totalAmount: o.total_amount // Remap snake_case to camelCase
+            }))
+          })
+        }
+        if (exps) set({ expenses: exps })
+      },
+      fetchProducts: async () => {
+        if (!IS_PROD || !supabase) {
+          set({ products: MOCK_PRODUCTS })
+          return
+        }
+        
+        const { data, error } = await supabase
+          .from('products')
+          .select('*')
+          .order('sales_count', { ascending: false }) // NEW: Sort by popularity
+        
+        if (data && !error) {
+          set({ 
+            products: data.map(p => ({
+              id: p.id,
+              name: p.name,
+              basePrice: Number(p.base_price),
+              category: p.category,
+              eggType: p.egg_type,
+              level: p.level,
+              isSpecialExtra: p.is_special_extra,
+              salesCount: p.sales_count // NEW: Map from DB
+            }))
+          })
+        }
+      },
+      fetchDoughOptions: async () => {
+        if (!IS_PROD || !supabase) {
+          set({ doughOptions: DOUGH_OPTIONS })
+          return
+        }
+
+        const { data, error } = await supabase.from('dough_options').select('*')
+        if (data && !error) {
+          set({ 
+            doughOptions: data.map(d => ({
+              id: d.id,
+              label: d.label,
+              extraPrice: Number(d.extra_price)
+            }))
+          })
+        } else {
+          set({ doughOptions: DOUGH_OPTIONS }) // Fallback
+        }
+      },
+      fetchToppingOptions: async () => {
+        if (!IS_PROD || !supabase) {
+          set({ toppingOptions: MOCK_TOPPINGS })
+          return
+        }
+
+        const { data, error } = await supabase.from('topping_options').select('*')
+        if (data && !error) {
+          set({ 
+            toppingOptions: data.map(t => ({
+              id: t.id,
+              label: t.label,
+              price: Number(t.price)
+            }))
+          })
+        }
+      },
+      verifyOwnerPin: async (pin: string) => {
+        if (!IS_PROD || !supabase) return pin === '591161'
+
+        const { data, error } = await supabase
+          .from('owner_settings')
+          .select('value')
+          .eq('key', 'owner_pin')
+          .eq('value', pin) // Direct match in query for security
+          .single()
+        
+        if (data && !error) {
+          await get().fetchOwnerData() // Fetch only if PIN is correct
+          return true
+        }
+        return false
+      }
     }),
     { name: 'setiarasa-cart-v3' } // Bump version due to structural change
   )
 )
+
+
+

@@ -86,7 +86,7 @@ export const getSalesTrend = (orders: Order[], analyticsRange: 'today' | 'week' 
   orders.forEach(order => {
     const orderTime = new Date(order.timestamp).getTime()
     const bucket = buckets.find((h, i) => {
-      const nextTime = buckets[i + 1]?.timestamp || Infinity
+      const nextTime = buckets[i + 1]?.timestamp || (h.timestamp + 3600000 * 24)
       return orderTime >= h.timestamp && orderTime < nextTime
     })
     if (bucket) bucket.amount += order.totalAmount
