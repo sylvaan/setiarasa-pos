@@ -1,6 +1,9 @@
 import { Menu } from 'lucide-react'
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
+import { Heading, Subheading } from '../ui/Typography'
+import Button from '../ui/Button'
+import Badge from '../ui/Badge'
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -17,31 +20,30 @@ export const Header = ({ onMenuClick, activeTab, selectedCategory }: HeaderProps
   
   return (
     <header className={cn(
-      "!pt-5 !pb-6 flex justify-between items-center w-full sticky top-0 z-30 backdrop-blur-2xl border-b shadow-sm !px-7 transition-all duration-1000",
-      isManis ? "!bg-emerald-50/80 border-emerald-100/50" : "!bg-amber-50/80 border-amber-100/50"
+      "!pt-5 !pb-6 !px-7 flex justify-between items-center w-full sticky top-0 z-30 border-b shadow-sm transition-all duration-300",
+      isManis ? "!bg-emerald-50 border-emerald-100/50" : "!bg-amber-50 border-amber-100/50"
     )}>
       <div className="flex items-center !gap-5">
-        <button 
+        <Button 
+          variant="white"
+          size="sm"
           onClick={onMenuClick}
-          className="!p-2.5 !bg-white rounded-2xl shadow-sm border border-slate-100 text-slate-600 active:scale-95 transition-all hover:bg-slate-50"
+          className="!p-2.5 !bg-white !rounded-2xl shadow-sm border border-slate-100 text-slate-600 hover:bg-slate-50 h-11 w-11"
         >
           <Menu size={22} strokeWidth={2.5} />
-        </button>
+        </Button>
         <div className="!text-left !py-1">
-          <h1 className={cn(
-            "!text-2xl !font-bold leading-none tracking-tight transition-colors duration-1000",
+          <Heading as="h1" className={cn(
+            "!text-2xl transition-colors duration-1000",
             isManis ? "!text-emerald-600" : "!text-amber-600"
-          )}>SetiaRasa</h1>
-          <p className="!text-[8px] !font-bold !text-slate-500 !uppercase !tracking-[0.25em] !mt-1.5 !opacity-80">PoS System Martabak</p>
+          )}>SetiaRasa</Heading>
+          <Subheading className="!mt-1.5 opacity-80 pl-0.5">POS System Martabak</Subheading>
         </div>
       </div>
       <div className="flex items-center !gap-3">
-        <div className={cn(
-          "!px-4 !py-1.5 !mr-1 rounded-full text-[9px] font-bold uppercase tracking-widest border shadow-sm transition-all",
-          activeTab === 'staff' ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-amber-50 text-amber-600 border-amber-100"
-        )}>
+        <Badge variant={activeTab === 'staff' ? 'emerald' : 'amber'} className="!px-4 !py-2 !rounded-full shadow-sm text-[9px] font-black uppercase tracking-widest transition-all">
           {activeTab === 'owner' ? 'Owner Mode' : 'Kasir Melayani'}
-        </div>
+        </Badge>
       </div>
     </header>
   )
