@@ -2,6 +2,9 @@ import { motion } from 'framer-motion'
 import { LayoutDashboard, ChevronRight } from 'lucide-react'
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
+import { Heading, Subheading } from '../ui/Typography'
+import Card from '../ui/Card'
+import Button from '../ui/Button'
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -14,16 +17,16 @@ interface OwnerAuthProps {
   onClear: () => void
 }
 
-export const OwnerAuth = ({ pinInput, isPinError, onPinInput, onClear }: OwnerAuthProps) => {
+const OwnerAuth = ({ pinInput, isPinError, onPinInput, onClear }: OwnerAuthProps) => {
   return (
     <div className="!flex !flex-col items-center justify-center !py-6 text-center !space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-[440px] mx-auto w-full">
       <div className="!space-y-1">
-        <div className="!mx-auto !my-2 w-20 h-20 bg-white/80 rounded-[1.5rem] flex items-center justify-center text-amber-600 border border-white shadow-xl">
+        <Card variant="white" padding="none" className="!mx-auto !my-2 w-20 h-20 rounded-[1.5rem] flex items-center justify-center text-amber-600 border border-white shadow-xl">
            <LayoutDashboard size={40} />
-        </div>
+        </Card>
         <div>
-          <h2 className="!text-xl !font-bold !text-slate-700 tracking-tight italic uppercase !my-0.75">Akses Owner</h2>
-          <p className="!text-slate-500 !text-[10px] !font-bold !uppercase !tracking-[0.2em] !my-2 !opacity-60">Masukkan PIN untuk melanjutkan</p>
+          <Heading as="h2" className="!text-xl !my-0.75">Akses Owner</Heading>
+          <Subheading className="!my-2 !opacity-60">Masukkan PIN untuk melanjutkan</Subheading>
         </div>
       </div>
 
@@ -60,30 +63,38 @@ export const OwnerAuth = ({ pinInput, isPinError, onPinInput, onClear }: OwnerAu
 
       <div className="grid grid-cols-3 gap-4 w-full max-w-[320px] px-4">
          {[1,2,3,4,5,6,7,8,9].map(n => (
-           <button 
+           <Button 
             key={n} 
+            variant="white"
+            size="xl"
             onClick={() => onPinInput(n.toString())}
-            className="aspect-square bg-white shadow-sm flex items-center justify-center rounded-[2rem] font-bold text-2xl text-slate-800 border border-slate-100 hover:bg-slate-50 active:scale-95 transition-all"
+            className="aspect-square !bg-white shadow-sm !text-2xl !text-slate-800 !rounded-[2rem] border border-slate-100 !p-0"
            >
              {n}
-           </button>
+           </Button>
          ))}
-         <button 
+         <Button 
+          variant="ghost"
+          size="md"
           onClick={onClear}
-          className="aspect-square flex items-center justify-center rounded-[2rem] font-bold text-[10px] text-slate-400 hover:text-slate-900 uppercase tracking-widest"
+          className="aspect-square !text-slate-400 hover:text-slate-900 border-none shadow-none"
          >
            Clear
-         </button>
-         <button 
+         </Button>
+         <Button 
+          variant="white"
+          size="xl"
           onClick={() => onPinInput('0')}
-          className="aspect-square bg-white shadow-sm flex items-center justify-center rounded-[2rem] font-bold text-2xl text-slate-800 border border-slate-100 hover:bg-slate-50 active:scale-95 transition-all"
+          className="aspect-square !bg-white shadow-sm !text-2xl !text-slate-800 !rounded-[2rem] border border-slate-100 !p-0"
          >
            0
-         </button>
-         <button className="aspect-square flex items-center justify-center rounded-[2rem] font-bold text-amber-500 hover:text-amber-600 transition-colors">
-            <ChevronRight size={32} strokeWidth={3} />
-         </button>
+         </Button>
+         <div className="aspect-square flex items-center justify-center">
+            <ChevronRight size={32} strokeWidth={3} className="text-amber-500 opacity-20" />
+         </div>
       </div>
     </div>
   )
 }
+
+export default OwnerAuth
