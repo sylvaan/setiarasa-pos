@@ -29,15 +29,30 @@ A mobile-first Point of Sale (POS) application and business dashboard built for 
 - **Reporting Engine**: XLSX (Professional Spreadsheet Generation)
 - **Mobile Bridge**: Capacitor (Cross-Platform Mobile Integration)
 
-## 🚀 Getting Started
+## 🚀 Deployment
+
+### 1. Public Showcase (Vercel)
+This project is configured for easy deployment on **Vercel** as a public-facing demo.
+- **Mode**: Automated to `demo` (Mock Data).
+- **Setup**:
+    1. Connect your Github Repository to Vercel.
+    2. Set `VITE_APP_MODE=demo` in Vercel Environment Variables.
+    3. The `vercel.json` ensures smooth SPA routing.
+
+### 2. Private Production (Tablet/Physical Shop)
+For real business use, the build is performed locally to ensure maximum data privacy.
+- **Mode**: `production` (Real Database/Supabase).
+- **Setup**:
+    1. Build locally with `VITE_APP_MODE=production`.
+    2. Distribute via APK or local network hosting.
+
+## 🚀 Local Development
 
 ### Prerequisites
-
 - Node.js (v18+)
 - npm or yarn
 
 ### Installation
-
 1. Clone the repository.
 2. Install dependencies:
    ```bash
