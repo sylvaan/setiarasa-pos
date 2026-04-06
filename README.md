@@ -1,35 +1,43 @@
-# Martabak SetiaRasa Lebaksiu
+# Martabak SetiaRasa Lebaksiu (v1.0.4)
 
-A mobile-first Point of Sale (POS) application built for **Martabak SetiaRasa Lebaksiu**, with a focus on ease of use and real-time sales tracking.
+A mobile-first Point of Sale (POS) application and business dashboard built for **Martabak SetiaRasa Lebaksiu**, focusing on operational efficiency, cloud-synced financial reporting, and owner-centric analytics.
 
-## Core Features
+## 🥯 Core Features (V1.0.4)
 
 ### Staff Mode
-- **Order Management**: Interface for quick product selection and cart management.
-- **Product Variants**: Support for different dough options (Original, Pandan, etc.) with automatic price adjustments.
-- **Persistent Cart**: Local state persistence and order handling using Zustand.
-- **Checkout Workflow**: Step-by-step process for completing transactions and recording sales.
 
-### Owner Mode
-- **Access Control**: Authentication via a 6-digit PIN for sensitive data access.
-- **Sales Analytics**: Overview of daily revenue, order counts, and net profit (Gross Sales - Expenses).
-- **Trends & Charts**: Visual representation of sales trends and product popularity over Day, Week, and Month periods.
-- **Record Keeping**: Transaction history and expense logging for basic business accounting.
+- **Order Management**: Interface for quick product selection and smart cart management.
+- **Dynamic Pricing Engine**: Support for dough options (Original, Pandan, etc.) with automatic price calculation rules.
+- **Cloud Awareness**: Real-time synchronization status (Online/Offline) directly in the sidebar footer.
+- **Popularity Tracking**: Visual badges and popularity sorting to identify best-selling martabak varieties.
 
-## Tech Stack
+### Owner Mode (Business Intelligence)
+
+- **Professional Reporting**: Export transaction history into categorized Excel (.xlsx) files with one tap, optimized for accounting.
+- **Security Hardening**: Authentication via 6-digit PIN with auto-logout after 1 hour of inactivity and "Turbo Login" instant transitions.
+- **Sales Analytics & Trends**: Advanced revenue tracking, order volume, and profit analysis over daily, weekly, and monthly ranges.
+- **Expense Control**: Real-time expense logging and categorization for accurate net profit calculations.
+
+## 🛠️ Tech Stack
+
 - **Frontend**: React 19 + Vite 6
 - **Styling**: Tailwind CSS v4
-- **State Management**: Zustand (with Persist Middleware)
+- **Backend & Database**: Supabase
+- **State Management**: Zustand
 - **Animations**: Framer Motion
 - **Icons**: Lucide React
+- **Reporting Engine**: XLSX (Professional Spreadsheet Generation)
+- **Mobile Bridge**: Capacitor (Cross-Platform Mobile Integration)
 
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
+
 - Node.js (v18+)
 - npm or yarn
 
 ### Installation
+
 1. Clone the repository.
 2. Install dependencies:
    ```bash
@@ -39,15 +47,7 @@ A mobile-first Point of Sale (POS) application built for **Martabak SetiaRasa Le
    ```bash
    npm run dev
    ```
-4. Build for production:
-   ```bash
-   npm run build
-   ```
-
-## Design and Architecture
-- **Component-Based**: Modular structure separating POS, Expenses, and Dashboard logic.
-- **Responsive Design**: Designed specifically for small-screen mobile devices.
-- **State Persistence**: Uses browser's local storage for data durability across sessions.
 
 ---
-*Developed for Martabak SetiaRasa Lebaksiu.*
+
+_Developed for Martabak SetiaRasa Lebaksiu._
