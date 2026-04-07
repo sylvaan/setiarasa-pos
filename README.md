@@ -1,8 +1,10 @@
-# Martabak SetiaRasa Lebaksiu (v1.0.5)
+# Martabak SetiaRasa POS App (v1.0.5)
+
+[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge&logo=vercel)](https://setiarasa-pos.vercel.app)
 
 A mobile-first Point of Sale (POS) application and business dashboard built for **Martabak SetiaRasa Lebaksiu**, focusing on operational efficiency, cloud-synced financial reporting, and owner-centric analytics.
 
-## 🥯 Core Features (V1.0.4)
+## 🥯 Core Features (V1.0.5)
 
 ### Staff Mode
 
@@ -14,8 +16,8 @@ A mobile-first Point of Sale (POS) application and business dashboard built for 
 ### Owner Mode (Business Intelligence)
 
 - **Professional Reporting**: Export transaction history into categorized Excel (.xlsx) files with one tap, optimized for accounting.
-- **Security Hardening**: Authentication via 6-digit PIN with auto-logout after 1 hour of inactivity and "Turbo Login" instant transitions.
-- **Sales Analytics & Trends**: Advanced revenue tracking, order volume, and profit analysis over daily, weekly, and monthly ranges.
+- **Security Hardening**: Authentication via 6-digit PIN with auto-logout.
+- **Sales Analytics & Trends**: Revenue tracking, order volume, and profit analysis over daily, weekly, and monthly ranges.
 - **Expense Control**: Real-time expense logging and categorization for accurate net profit calculations.
 
 ## 🛠️ Tech Stack
@@ -32,27 +34,33 @@ A mobile-first Point of Sale (POS) application and business dashboard built for 
 ## 🚀 Deployment
 
 ### 1. Public Showcase (Vercel)
+
 This project is configured for easy deployment on **Vercel** as a public-facing demo.
+
 - **Mode**: Automated to `demo` (Mock Data).
 - **Setup**:
-    1. Connect your Github Repository to Vercel.
-    2. Set `VITE_APP_MODE=demo` in Vercel Environment Variables.
-    3. The `vercel.json` ensures smooth SPA routing.
+  1. Connect your Github Repository to Vercel.
+  2. Set `VITE_APP_MODE=demo` in Vercel Environment Variables.
+  3. The `vercel.json` ensures smooth SPA routing.
 
 ### 2. Private Production (Tablet/Physical Shop)
+
 For real business use, the build is performed locally to ensure maximum data privacy.
+
 - **Mode**: `production` (Real Database/Supabase).
 - **Setup**:
-    1. Build locally with `VITE_APP_MODE=production`.
-    2. Distribute via APK or local network hosting.
+  1. Build locally with `VITE_APP_MODE=production`.
+  2. Distribute via APK or local network hosting.
 
 ## 🚀 Local Development
 
 ### Prerequisites
+
 - Node.js (v18+)
 - npm or yarn
 
 ### Installation
+
 1. Clone the repository.
 2. Install dependencies:
    ```bash
