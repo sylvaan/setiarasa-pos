@@ -160,6 +160,23 @@ export const SideNavigation = ({
                           Belanja Bahan
                         </span>
                       </button>
+                      <button
+                        onClick={() => {
+                          setActiveStaffView("history");
+                          onClose();
+                        }}
+                        className={cn(
+                          "w-full flex items-center gap-4 !px-5 !py-4 !rounded-2xl transition-all group relative overflow-hidden active:scale-[0.98]",
+                          activeStaffView === "history"
+                            ? "bg-emerald-50 text-emerald-600 border border-emerald-100 font-bold"
+                            : "text-slate-500 hover:bg-slate-50",
+                        )}
+                      >
+                        <History size={18} strokeWidth={2.5} />
+                        <span className="text-[10px] uppercase tracking-[0.1em] whitespace-nowrap">
+                          Riwayat Hari Ini
+                        </span>
+                      </button>
                     </>
                   ) : (
                     <>
@@ -265,7 +282,7 @@ export const SideNavigation = ({
                 </div>
               )}
               <p className="!text-center !text-[8px] !text-slate-300 !mt-4 !uppercase !tracking-[0.2em] !font-medium">
-                Martabak SetiaRasa &bull; v1.0.5
+                Martabak SetiaRasa &bull; v1.1.5
               </p>
             </div>
           </motion.div>
