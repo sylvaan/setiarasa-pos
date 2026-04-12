@@ -7,6 +7,7 @@ import Card from '../ui/Card'
 import Button from '../ui/Button'
 import Badge from '../ui/Badge'
 import { Heading, Subheading } from '../ui/Typography'
+import ProgressLoader from '../shared/ProgressLoader'
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -20,6 +21,7 @@ interface CartModalProps {
   addItem: (product: Product, dough?: DoughOption, toppings?: ToppingOption[]) => void
   getTotal: () => number
   checkout: () => void
+  isSyncing?: boolean
 }
 
 export const CartModal = ({
@@ -29,7 +31,8 @@ export const CartModal = ({
   removeItem,
   addItem,
   getTotal,
-  checkout
+  checkout,
+  isSyncing = false
 }: CartModalProps) => {
   if (items.length === 0) return null
 
@@ -57,6 +60,7 @@ export const CartModal = ({
             transition={{ duration: 0.2, ease: "easeOut" }}
             className="fixed top-1/2 left-1/2 w-[92%] max-w-[440px] !bg-white rounded-[1.5rem] shadow-[0_30px_100px_rgba(0,0,0,0.3)] z-50 !p-7 !pb-3 !pt-7 !border border-white/60 overflow-hidden"
           >
+            <ProgressLoader isVisible={isSyncing} />
             {/* Header */}
             <div className="relative text-center !mb-10">
               <Heading as="h3" className="!text-lg">Detail Pesanan</Heading>

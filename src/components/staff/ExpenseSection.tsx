@@ -4,16 +4,19 @@ import type { Expense } from '../../types'
 import { Heading, Subheading, Label } from '../ui/Typography'
 import Card from '../ui/Card'
 import Button from '../ui/Button'
+import ProgressLoader from '../shared/ProgressLoader'
 
 interface ExpenseSectionProps {
   expenses: Expense[]
-  addExpense: (title: string, amount: number, category: string) => void
+  addExpense: (title: string, amount: number, category: string) => Promise<void>
   removeExpense: (id: string) => void
+  showNotification: (message: string, type?: 'success' | 'error') => void
+  isSyncing?: boolean
 }
 
-const ExpenseSection = ({ expenses, addExpense, removeExpense }: ExpenseSectionProps) => {
+const ExpenseSection = ({ expenses, addExpense, removeExpense, showNotification, isSyncing = false }: ExpenseSectionProps) => {
   return (
-    <div className="max-w-[440px] mx-auto w-full !space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500 !pb-20">
+    <div className="max-w-[440px] mx-auto w-full !space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500 !pb-20 text-left">
       <div className="!space-y-4 text-center">
         <div className="w-20 h-20 !mt-3 !bg-emerald-50 !rounded-[2rem] flex items-center justify-center text-emerald-600 !mx-auto shadow-sm !border !border-emerald-100/50">
           <Wallet size={36} strokeWidth={1.5} />
@@ -25,10 +28,11 @@ const ExpenseSection = ({ expenses, addExpense, removeExpense }: ExpenseSectionP
       </div>
 
       {/* Expense Form */}
-      <Card variant="white" padding="xl" className="shadow-xl shadow-slate-200/50 !space-y-6">
+      <Card variant="white" padding="xl" className="relative shadow-xl shadow-slate-200/50 !space-y-6 overflow-hidden">
+        <ProgressLoader isVisible={isSyncing} />
         <div className="!space-y-4">
           <div className="!space-y-2">
-            <Label className="!ml-1 opacity-70">Nama Barang</Label>
+            <Label className="!ml-1 opacity-70 border-none">Nama Barang</Label>
             <input 
               type="text" 
               id="expense-title-input"
@@ -37,7 +41,7 @@ const ExpenseSection = ({ expenses, addExpense, removeExpense }: ExpenseSectionP
             />
           </div>
           <div className="!space-y-2">
-            <Label className="!ml-1 opacity-70">Nominal (Rp)</Label>
+            <Label className="!ml-1 opacity-70 border-none">Nominal (Rp)</Label>
             <input 
               type="number" 
               id="expense-amount-input"
@@ -50,17 +54,23 @@ const ExpenseSection = ({ expenses, addExpense, removeExpense }: ExpenseSectionP
           variant="emerald"
           fullWidth
           size="lg"
-          onClick={() => {
+          disabled={isSyncing}
+          onClick={async () => {
             const titleInput = document.getElementById('expense-title-input') as HTMLInputElement
             const amountInput = document.getElementById('expense-amount-input') as HTMLInputElement
             if (titleInput.value && amountInput.value) {
-              addExpense(titleInput.value, parseInt(amountInput.value), 'bahan')
-              titleInput.value = ''
-              amountInput.value = ''
+              try {
+                await addExpense(titleInput.value, parseInt(amountInput.value), 'bahan')
+                showNotification("Pengeluaran Berhasil Dicatat!")
+                titleInput.value = ''
+                amountInput.value = ''
+              } catch (error) {
+                showNotification("Gagal mencatat belanja. Coba lagi.", "error")
+              }
             }
           }}
         >
-          Simpan Belanja
+          {isSyncing ? "Menyimpan..." : "Simpan Belanja"}
         </Button>
       </Card>
 

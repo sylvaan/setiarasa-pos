@@ -28,6 +28,8 @@ import { SideNavigation } from "./components/common/SideNavigation";
 import { POSSection } from "./components/staff/POSSection";
 import { DoughSelectorModal } from "./components/staff/DoughSelectorModal";
 import { CartModal } from "./components/staff/CartModal";
+import NotificationToast from "./components/shared/NotificationToast";
+import type { NotificationType } from "./components/shared/NotificationToast";
 import { IS_DEMO } from "./lib/config";
 import LoadingState from "./components/common/LoadingState";
 
@@ -59,6 +61,15 @@ export default function App() {
     "today" | "week" | "month"
   >("today");
   const [isSideNavOpen, setIsSideNavOpen] = useState(false);
+  const [notification, setNotification] = useState<{
+    visible: boolean;
+    message: string;
+    type: NotificationType;
+  }>({
+    visible: false,
+    message: "",
+    type: "success",
+  });
   const [isPinError, setIsPinError] = useState(false);
   const [ownerAuthTime, setOwnerAuthTime] = useState<number | null>(null);
 
@@ -77,6 +88,7 @@ export default function App() {
     removeExpense,
     fetchInitialData,
     verifyOwnerPin,
+    isSyncing,
   } = useCartStore();
 
   useEffect(() => {
@@ -200,12 +212,24 @@ export default function App() {
     setSelectedProductForDough(null);
   };
 
-  const handleCheckout = async () => {
-    await checkout();
-    // After checkout is successful, refresh data to update popularity
+  const showNotification = (message: string, type: NotificationType = 'success') => {
+    setNotification({ visible: true, message, type });
     setTimeout(() => {
-      fetchInitialData();
-    }, 500);
+      setNotification(prev => ({ ...prev, visible: false }));
+    }, 3000);
+  };
+
+  const handleCheckout = async () => {
+    try {
+      await checkout();
+      showNotification("Pesanan Berhasil Disimpan!");
+      // After checkout is successful, refresh data to update popularity
+      setTimeout(() => {
+        fetchInitialData();
+      }, 500);
+    } catch (error) {
+      showNotification("Gagal menyimpan pesanan. Coba lagi.", "error");
+    }
   };
 
   return (
@@ -213,8 +237,8 @@ export default function App() {
       className={cn(
         "container min-h-screen pb-56 overflow-hidden transition-colors duration-500 bg-linear-to-b",
         selectedCategory === "manis"
-          ? "from-emerald-50/30 to-sky-50"
-          : "from-amber-50/30 to-sky-50",
+          ? "from-emerald-50 to-sky-50"
+          : "from-amber-50 to-sky-50",
       )}
     >
       {/* Demo Mode Badge */}
@@ -227,11 +251,11 @@ export default function App() {
       )}
 
       {/* Optimized Ambience Layers */}
-      <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
+      <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden bg-white/50">
         {/* Manis Layer */}
         <div
           className={cn(
-            "absolute -top-24 -left-24 w-96 h-96 rounded-full blur-[100px] bg-emerald-400/20 transition-opacity duration-500 will-change-opacity transform-gpu translate-z-0",
+            "absolute -top-24 -left-24 w-80 h-80 rounded-full blur-[60px] bg-emerald-400/20 transition-opacity duration-500 will-change-opacity transform-gpu translate-z-0",
             selectedCategory === "manis" ? "opacity-100" : "opacity-0",
           )}
         />
@@ -239,13 +263,13 @@ export default function App() {
         {/* Telor Layer */}
         <div
           className={cn(
-            "absolute -bottom-24 -right-24 w-[450px] h-[450px] rounded-full blur-[120px] bg-amber-400/15 transition-opacity duration-500 will-change-opacity transform-gpu translate-z-0",
+            "absolute -bottom-24 -right-24 w-[350px] h-[350px] rounded-full blur-[60px] bg-amber-400/20 transition-opacity duration-500 will-change-opacity transform-gpu translate-z-0",
             selectedCategory === "telor" ? "opacity-100" : "opacity-0",
           )}
         />
 
         {/* Global Accent layer */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-sky-400/5 blur-[150px] opacity-10" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-sky-400/10 blur-[60px] opacity-10" />
       </div>
 
       <Header
@@ -270,6 +294,8 @@ export default function App() {
                 expenses={expenses}
                 addExpense={addExpense}
                 removeExpense={removeExpense}
+                showNotification={showNotification}
+                isSyncing={isSyncing}
               />
             ) : (
               <StaffHistory />
@@ -332,8 +358,16 @@ export default function App() {
           addItem={addItem}
           getTotal={getTotal}
           checkout={handleCheckout}
+          isSyncing={isSyncing}
         />
       )}
+
+      <NotificationToast
+        isVisible={notification.visible}
+        message={notification.message}
+        type={notification.type}
+        onClose={() => setNotification((prev) => ({ ...prev, visible: false }))}
+      />
     </div>
   );
 }
