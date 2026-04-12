@@ -5,6 +5,7 @@ const path = require('path');
 const packageJsonPath = path.join(__dirname, '../package.json');
 const buildGradlePath = path.join(__dirname, '../android/app/build.gradle');
 const sidebarPath = path.join(__dirname, '../src/components/common/SideNavigation.tsx');
+const configPath = path.join(__dirname, '../src/lib/config.ts');
 const readmePath = path.join(__dirname, '../README.md');
 
 // Load Version
@@ -33,6 +34,14 @@ if (fs.existsSync(sidebarPath)) {
   content = content.replace(/Martabak SetiaRasa &bull; v[\d.]+/, `Martabak SetiaRasa &bull; v${version}`);
   fs.writeFileSync(sidebarPath, content);
   console.log('\x1b[32m \u2713\x1b[0m SideNavigation.tsx updated.');
+}
+
+// 2b. Sync config.ts
+if (fs.existsSync(configPath)) {
+  let content = fs.readFileSync(configPath, 'utf8');
+  content = content.replace(/export const APP_VERSION = '[^']+'/, `export const APP_VERSION = '${version}'`);
+  fs.writeFileSync(configPath, content);
+  console.log('\x1b[32m \u2713\x1b[0m config.ts updated.');
 }
 
 // 3. Sync README.md

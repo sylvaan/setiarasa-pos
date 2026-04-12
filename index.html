@@ -5,6 +5,37 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Setiarasa POS</title>
+    <script>
+      // Emergency Cache Buster for v1.2.0
+      // Forces a one-time hard refresh and cache clear if upgrading from an older version
+      (function() {
+        var V = '1.2.0';
+        var stored = localStorage.getItem('app_v_check');
+        if (stored !== V) {
+          console.log('[CacheBuster] Version mismatch (' + stored + ' vs ' + V + '). Clearing caches...');
+          
+          if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(function(rs) {
+              rs.forEach(function(r) { r.unregister(); });
+            });
+          }
+
+          if ('caches' in window) {
+            caches.keys().then(function(names) {
+              names.forEach(function(n) { caches.delete(n); });
+            });
+          }
+
+          localStorage.setItem('app_v_check', V);
+          localStorage.setItem('app_version', V);
+          
+          // Only force reload once to avoid infinite loops
+          if (stored) {
+             window.location.reload(true);
+          }
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

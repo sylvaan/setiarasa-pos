@@ -98,40 +98,6 @@ export default function App() {
     fetchInitialData();
   }, [fetchInitialData]);
 
-  // Version Sentry: Clear cache and reload if APK version changed
-  useEffect(() => {
-    const handleVersionUpdate = async () => {
-      const storedVersion = localStorage.getItem("app_version");
-      
-      if (storedVersion && storedVersion !== APP_VERSION) {
-        console.log(`Version change detected: ${storedVersion} -> ${APP_VERSION}. Clearing cache...`);
-        
-        try {
-          // Clear Service Worker Caches
-          if ('caches' in window) {
-            const cacheNames = await caches.keys();
-            await Promise.all(cacheNames.map(name => caches.delete(name)));
-          }
-          
-          // Clear potentially problematic localStorage items if needed
-          // localStorage.clear(); // Extreme measure, maybe just update version
-          
-          localStorage.setItem("app_version", APP_VERSION);
-          
-          // Force reload to pick up new assets from APK
-          if (Capacitor.isNativePlatform()) {
-            window.location.reload();
-          }
-        } catch (error) {
-          console.error("Error during version update cleanup:", error);
-        }
-      } else if (!storedVersion) {
-        localStorage.setItem("app_version", APP_VERSION);
-      }
-    };
-
-    handleVersionUpdate();
-  }, []);
 
   // Security: Auto logout owner after 1 hour
   useEffect(() => {
