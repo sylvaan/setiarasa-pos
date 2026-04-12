@@ -1,10 +1,10 @@
-# Martabak SetiaRasa POS App (v1.1.9)
+# Martabak SetiaRasa POS App (v1.1.10)
 
 [![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge&logo=vercel)](https://setiarasa-pos.vercel.app)
 
 A mobile-first Point of Sale (POS) application and business dashboard built for **Martabak SetiaRasa Lebaksiu**, focusing on operational efficiency, cloud-synced financial reporting, and owner-centric analytics.
 
-## 🥯 Core Features (v1.1.9)
+## 🥯 Core Features (v1.1.10)
 
 ### Staff Mode
 

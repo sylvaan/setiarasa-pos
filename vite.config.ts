@@ -12,7 +12,7 @@ export default defineConfig({
       additionalLegacyPolyfills: ['regenerator-runtime/runtime']
     }),
     VitePWA({
-      registerType: 'prompt',
+      registerType: 'autoUpdate',
       manifest: {
         name: 'Martabak Setia Rasa POS',
         short_name: 'SetiaRasa',
