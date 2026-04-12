@@ -7,14 +7,15 @@ import Card from "../../ui/Card";
 import Badge from "../../ui/Badge";
 import Button from "../../ui/Button";
 import SectionHeader from "../../shared/SectionHeader";
-import { exportOrdersToExcel } from "../../../utils/excelExport";
+import { exportBusinessReportToExcel } from "../../../utils/excelExport";
+import { useCartStore } from "../../../store/useCartStore";
 
 interface OwnerHistoryProps {
-  orders: Order[];
   setActiveOwnerView: (view: OwnerView) => void;
 }
 
-const OwnerHistory = ({ orders, setActiveOwnerView }: OwnerHistoryProps) => {
+const OwnerHistory = ({ setActiveOwnerView }: OwnerHistoryProps) => {
+  const { orders, expenses } = useCartStore();
   const [searchQuery, setSearchQuery] = useState("");
   const [visibleCount, setVisibleCount] = useState(10);
 
@@ -206,11 +207,11 @@ const OwnerHistory = ({ orders, setActiveOwnerView }: OwnerHistoryProps) => {
         animate={{ scale: 1, opacity: 1, y: 0 }}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        onClick={() => exportOrdersToExcel(orders)}
-        className="fixed bottom-24 right-6 z-50 flex items-center gap-3 !bg-emerald-600 !text-white !p-5 !rounded-3xl shadow-[0_15px_40px_rgba(16,185,129,0.3)] border-none font-black text-[10px] tracking-wider uppercase"
+        onClick={() => exportBusinessReportToExcel(orders, expenses)}
+        className="!fixed !bottom-6 !right-6 !bg-indigo-600 !text-white !px-6 !py-4 !rounded-full !shadow-2xl !flex !items-center !gap-3 !z-50 !border !border-indigo-400/30 !backdrop-blur-sm"
       >
         <FileDown size={18} strokeWidth={3} />
-        <span className="whitespace-nowrap">Export ke Excel</span>
+        <span className="whitespace-nowrap font-black text-[10px] tracking-wider uppercase">Export ke Excel</span>
       </motion.button>
     </div>
   );

@@ -49,5 +49,5 @@ export interface Expense {
   category: string;
 }
 
-export type StaffView = "pos" | "expenses";
+export type StaffView = "pos" | "expenses" | "history";
 export type OwnerView = "overview" | "sales" | "history";

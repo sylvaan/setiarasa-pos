@@ -33,6 +33,7 @@ import LoadingState from "./components/common/LoadingState";
 
 // Lazy loaded components
 const ExpenseSection = lazy(() => import("./components/staff/ExpenseSection"));
+const StaffHistory = lazy(() => import("./components/staff/sections/StaffHistory"));
 const OwnerAuth = lazy(() => import("./components/owner/OwnerAuth"));
 const OwnerDashboard = lazy(() => import("./components/owner/OwnerDashboard"));
 
@@ -264,12 +265,14 @@ export default function App() {
                 items={items}
                 onProductClick={handleProductClick}
               />
-            ) : (
+            ) : activeStaffView === "expenses" ? (
               <ExpenseSection
                 expenses={expenses}
                 addExpense={addExpense}
                 removeExpense={removeExpense}
               />
+            ) : (
+              <StaffHistory />
             )
           ) : !isOwnerAuthenticated ? (
             <OwnerAuth

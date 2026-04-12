@@ -61,7 +61,6 @@ const OwnerDashboard = ({
 
       {activeOwnerView === 'history' && (
         <OwnerHistory 
-          orders={orders}
           setActiveOwnerView={setActiveOwnerView}
         />
       )}
