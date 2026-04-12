@@ -1,3 +1,5 @@
+export const APP_VERSION = '1.1.10'
+
 /**
  * Application Modes:
  * - 'demo': Uses local mock data for portfolio/recruitment showcases.
@@ -12,6 +14,7 @@ export const CONFIG = {
   supabaseUrl: import.meta.env.VITE_SUPABASE_URL || '',
   supabaseKey: import.meta.env.VITE_SUPABASE_ANON_KEY || '',
   mode: APP_MODE,
+  version: APP_VERSION,
 }
 
 if (IS_PROD && (!CONFIG.supabaseUrl || !CONFIG.supabaseKey)) {

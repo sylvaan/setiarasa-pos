@@ -79,7 +79,6 @@ export const POSSection = ({
               <ProductCard 
                 key={product.id}
                 product={product}
-                idx={idx}
                 isBestSeller={idx < 2 && (product.salesCount || 0) > 0}
                 cartItem={totalQty > 0 ? { quantity: totalQty } : undefined}
                 onClick={() => onProductClick(product)}

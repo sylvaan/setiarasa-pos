@@ -50,4 +50,4 @@ export interface Expense {
 }
 
 export type StaffView = "pos" | "expenses" | "history";
-export type OwnerView = "overview" | "sales" | "history";
+export type OwnerView = "overview" | "sales" | "history" | "catalog";

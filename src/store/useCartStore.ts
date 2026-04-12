@@ -26,6 +26,12 @@ interface CartStore {
   fetchToppingOptions: () => Promise<void>
   fetchOwnerData: () => Promise<void>
   verifyOwnerPin: (pin: string) => Promise<boolean>
+  upsertProduct: (product: Partial<Product>) => Promise<void>
+  deleteProduct: (id: string) => Promise<void>
+  upsertTopping: (topping: Partial<ToppingOption>) => Promise<void>
+  deleteTopping: (id: string) => Promise<void>
+  lastRemovedItem: { item: CartItem, index: number } | null
+  undoRemoveItem: () => void
 }
 
 const calculateItemPrice = (product: Product, selectedDough?: DoughOption, selectedToppings?: ToppingOption[]) => {
@@ -53,6 +59,7 @@ export const useCartStore = create<CartStore>()(
       doughOptions: DOUGH_OPTIONS, // Default to Mock
       toppingOptions: MOCK_TOPPINGS,
       isSyncing: false,
+      lastRemovedItem: null,
       addItem: (product, selectedDough, selectedToppings = []) => set((state) => {
         const doughId = selectedDough?.id || 'none'
         const toppingIds = selectedToppings.map(t => t.id).sort().join(',')
@@ -109,13 +116,35 @@ export const useCartStore = create<CartStore>()(
             })
           }
         }
+
+        // Final removal from list
+        const removedItem = state.items.find((i) => {
+          const iDoughId = i.selectedDough?.id || 'none'
+          const iToppingIds = i.selectedToppings?.map(t => t.id).sort().join(',') || 'no-extra'
+          return `${i.id}-${iDoughId}-${iToppingIds}` === itemId
+        })
+        
+        const removedIndex = state.items.findIndex((i) => {
+          const iDoughId = i.selectedDough?.id || 'none'
+          const iToppingIds = i.selectedToppings?.map(t => t.id).sort().join(',') || 'no-extra'
+          return `${i.id}-${iDoughId}-${iToppingIds}` === itemId
+        })
+
         return { 
+          lastRemovedItem: removedItem ? { item: removedItem, index: removedIndex } : null,
           items: state.items.filter((i) => {
             const iDoughId = i.selectedDough?.id || 'none'
             const iToppingIds = i.selectedToppings?.map(t => t.id).sort().join(',') || 'no-extra'
             return `${i.id}-${iDoughId}-${iToppingIds}` !== itemId
           }) 
         }
+      }),
+      undoRemoveItem: () => set((state) => {
+        if (!state.lastRemovedItem) return state
+        const { item, index } = state.lastRemovedItem
+        const newItems = [...state.items]
+        newItems.splice(index, 0, item)
+        return { items: newItems, lastRemovedItem: null }
       }),
       clearCart: () => set({ items: [] }),
       getTotal: () => get().items.reduce((acc, item) => acc + (item.totalItemPrice * item.quantity), 0),
@@ -265,20 +294,141 @@ export const useCartStore = create<CartStore>()(
         }
       },
       verifyOwnerPin: async (pin: string) => {
-        if (!IS_PROD || !supabase) return pin === '591161'
+        // Mode Demo: Use 123456 as requested
+        if (!IS_PROD) return pin === '123456'
+
+        // Mode Produksi: Mandatory Database Check
+        if (!supabase) return false
 
         const { data, error } = await supabase
           .from('owner_settings')
           .select('value')
           .eq('key', 'owner_pin')
-          .eq('value', pin) // Direct match in query for security
+          .eq('value', pin)
           .single()
         
         if (data && !error) {
-          await get().fetchOwnerData() // Fetch only if PIN is correct
+          await get().fetchOwnerData()
           return true
         }
         return false
+      },
+      upsertProduct: async (product) => {
+        set({ isSyncing: true })
+        const productId = product.id || `m-${Date.now()}`
+        
+        const dbProduct = {
+          id: productId,
+          name: product.name,
+          base_price: product.basePrice,
+          category: product.category,
+          egg_type: product.eggType,
+          is_special_extra: product.isSpecialExtra,
+          level: product.level
+        }
+
+        if (IS_PROD && supabase) {
+          const { error } = await supabase.from('products').upsert(dbProduct)
+          if (error) {
+            console.error('Error upserting product:', error)
+            set({ isSyncing: false })
+            return
+          }
+        }
+
+        // Update local state
+        set((state) => {
+          const newProducts = [...state.products]
+          const existingIdx = newProducts.findIndex(p => p.id === productId)
+          
+          const fullProduct: Product = {
+             id: productId,
+             name: product.name || '',
+             basePrice: product.basePrice || 0,
+             category: product.category || 'manis',
+             eggType: product.eggType,
+             isSpecialExtra: product.isSpecialExtra,
+             level: product.level,
+             salesCount: product.salesCount || 0
+          }
+
+          if (existingIdx > -1) {
+            newProducts[existingIdx] = fullProduct
+          } else {
+            newProducts.push(fullProduct)
+          }
+          
+          return { products: newProducts, isSyncing: false }
+        })
+      },
+      deleteProduct: async (id) => {
+        set({ isSyncing: true })
+        if (IS_PROD && supabase) {
+          const { error } = await supabase.from('products').delete().eq('id', id)
+          if (error) {
+            console.error('Error deleting product:', error)
+            set({ isSyncing: false })
+            return
+          }
+        }
+
+        set((state) => ({
+          products: state.products.filter(p => p.id !== id),
+          isSyncing: false
+        }))
+      },
+      upsertTopping: async (topping) => {
+        set({ isSyncing: true })
+        const toppingId = topping.id || `t-${Date.now()}`
+        
+        const dbTopping = {
+          id: toppingId,
+          label: topping.label,
+          price: topping.price
+        }
+
+        if (IS_PROD && supabase) {
+          const { error } = await supabase.from('topping_options').upsert(dbTopping)
+          if (error) {
+            console.error('Error upserting topping:', error)
+            set({ isSyncing: false })
+            return
+          }
+        }
+
+        set((state) => {
+          const newToppings = [...state.toppingOptions]
+          const existingIdx = newToppings.findIndex(t => t.id === toppingId)
+          const fullTopping: ToppingOption = {
+            id: toppingId,
+            label: topping.label || '',
+            price: topping.price || 0
+          }
+
+          if (existingIdx > -1) {
+            newToppings[existingIdx] = fullTopping
+          } else {
+            newToppings.push(fullTopping)
+          }
+          
+          return { toppingOptions: newToppings, isSyncing: false }
+        })
+      },
+      deleteTopping: async (id) => {
+        set({ isSyncing: true })
+        if (IS_PROD && supabase) {
+          const { error } = await supabase.from('topping_options').delete().eq('id', id)
+          if (error) {
+            console.error('Error deleting topping:', error)
+            set({ isSyncing: false })
+            return
+          }
+        }
+
+        set((state) => ({
+          toppingOptions: state.toppingOptions.filter(t => t.id !== id),
+          isSyncing: false
+        }))
       }
     }),
     { name: 'setiarasa-cart-v3' } // Bump version due to structural change

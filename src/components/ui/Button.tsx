@@ -40,7 +40,7 @@ const Button = ({
 
   return (
     <motion.button
-      whileTap={{ scale: 0.97 }}
+      whileTap={{ scale: 0.98 }}
       className={cn(
         "inline-flex items-center justify-center rounded-2xl font-bold uppercase tracking-widest transition-all border outline-none disabled:opacity-50 disabled:cursor-not-allowed",
         variants[variant],

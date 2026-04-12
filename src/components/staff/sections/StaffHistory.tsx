@@ -6,6 +6,7 @@ import { Heading, Label } from "../../ui/Typography";
 import Card from "../../ui/Card";
 import Badge from "../../ui/Badge";
 import SectionHeader from "../../shared/SectionHeader";
+import { formatCurrency } from "../../../utils/format";
 
 const StaffHistory = () => {
   const { orders } = useCartStore();
@@ -60,20 +61,36 @@ const StaffHistory = () => {
                     </div>
                   </div>
                   <Badge variant="emerald" className="!px-3 !py-1 !rounded-lg !text-[10px]">
-                    Rp {order.totalAmount.toLocaleString()}
+                    {formatCurrency(order.totalAmount)}
                   </Badge>
                 </div>
 
                 {/* Items Summary */}
                 <div className="bg-slate-50/80 rounded-xl p-3 space-y-2">
                   {order.items.map((item, i) => (
-                    <div key={i} className="flex justify-between items-center">
-                      <span className="text-[10px] text-slate-600 font-medium">
-                        {item.quantity}x {item.name}
-                      </span>
-                      <span className="text-[9px] text-slate-400">
-                        {item.category === "manis" ? "Manis" : "Telor"}
-                      </span>
+                    <div key={i} className="space-y-1">
+                      <div className="flex justify-between items-center">
+                        <span className="text-[10px] text-slate-600 font-black">
+                          {item.quantity}x {item.name}
+                        </span>
+                        <span className="text-[9px] text-slate-400 font-bold uppercase tracking-widest">
+                          {item.category === "manis" ? "Manis" : "Telor"}
+                        </span>
+                      </div>
+                      {(item.selectedDough || (item.selectedToppings && item.selectedToppings.length > 0)) && (
+                        <div className="!pl-4 flex flex-wrap gap-1.5 opacity-80">
+                          {item.selectedDough && item.selectedDough.id !== 'original' && (
+                            <span className="text-[9px] text-slate-500 bg-white px-2 py-0.5 rounded-md border border-slate-100">
+                              Adonan: {item.selectedDough.label}
+                            </span>
+                          )}
+                          {item.selectedToppings?.map((top, tIdx) => (
+                            <span key={tIdx} className="text-[9px] text-emerald-600 bg-emerald-50/50 px-2 py-0.5 rounded-md border border-emerald-100/50">
+                              + {top.label}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>

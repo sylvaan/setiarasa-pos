@@ -9,6 +9,7 @@ import Button from "../../ui/Button";
 import SectionHeader from "../../shared/SectionHeader";
 import { exportBusinessReportToExcel } from "../../../utils/excelExport";
 import { useCartStore } from "../../../store/useCartStore";
+import { formatCurrency } from "../../../utils/format";
 
 interface OwnerHistoryProps {
   setActiveOwnerView: (view: OwnerView) => void;
@@ -139,7 +140,7 @@ const OwnerHistory = ({ setActiveOwnerView }: OwnerHistoryProps) => {
                         </Heading>
                       </div>
                       <Heading className="!text-lg !text-emerald-600">
-                        Rp {Number((order.totalAmount / 1000).toFixed(1))}k
+                        {formatCurrency(order.totalAmount)}
                       </Heading>
                     </div>
                     <div className="!flex flex-col !gap-3">
@@ -156,11 +157,13 @@ const OwnerHistory = ({ setActiveOwnerView }: OwnerHistoryProps) => {
                               {it.quantity}
                             </span>
                             <span className="font-bold text-slate-700">
-                              {it.name}{" "}
-                              {it.selectedDough
-                                ? `(${it.selectedDough.label})`
-                                : ""}
+                              {it.name}
                             </span>
+                            {it.selectedDough && it.selectedDough.id !== 'original' && (
+                              <span className="text-[9px] text-amber-600 font-bold ml-2">
+                                ({it.selectedDough.label})
+                              </span>
+                            )}
                           </Badge>
                           {it.selectedToppings &&
                             it.selectedToppings.length > 0 && (

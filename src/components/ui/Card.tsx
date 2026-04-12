@@ -39,7 +39,7 @@ const Card = ({
 
   return (
     <motion.div
-      whileHover={hoverScale ? { y: -5, scale: 1.01 } : undefined}
+      whileHover={undefined}
       className={cn(
         "relative !rounded-[2rem] border transition-all duration-200",
         variants[variant],

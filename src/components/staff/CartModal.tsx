@@ -6,8 +6,9 @@ import { twMerge } from 'tailwind-merge'
 import Card from '../ui/Card'
 import Button from '../ui/Button'
 import Badge from '../ui/Badge'
-import { Heading, Subheading } from '../ui/Typography'
+import { Heading } from '../ui/Typography'
 import ProgressLoader from '../shared/ProgressLoader'
+import { formatCurrency } from "../../utils/format"
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -22,6 +23,8 @@ interface CartModalProps {
   getTotal: () => number
   checkout: () => void
   isSyncing?: boolean
+  lastRemovedItem: any | null
+  undoRemoveItem: () => void
 }
 
 export const CartModal = ({
@@ -32,7 +35,9 @@ export const CartModal = ({
   addItem,
   getTotal,
   checkout,
-  isSyncing = false
+  isSyncing = false,
+  lastRemovedItem,
+  undoRemoveItem
 }: CartModalProps) => {
   if (items.length === 0) return null
 
@@ -102,7 +107,7 @@ export const CartModal = ({
                         </div>
                       </div>
                       <Heading as="p" className="!text-[11px] !text-amber-600">
-                        Rp {Number((item.totalItemPrice / 1000).toFixed(1))}k
+                        {formatCurrency(item.totalItemPrice * item.quantity)}
                       </Heading>
                     </div>
 
@@ -130,13 +135,35 @@ export const CartModal = ({
               })}
             </div>
 
+            {/* Undo Notification */}
+            <AnimatePresence>
+              {lastRemovedItem && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  className="!mb-6 !p-3 !bg-slate-900 !text-white !rounded-xl !flex !justify-between !items-center !shadow-lg"
+                >
+                  <span className="!text-[10px] font-medium opacity-90">
+                    Item dihapus: {lastRemovedItem.item.name}
+                  </span>
+                  <button 
+                    onClick={undoRemoveItem}
+                    className="!text-[10px] !bg-emerald-500 !px-3 !py-1 !rounded-lg font-bold !uppercase tracking-wider"
+                  >
+                    Undo
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             {/* Footer Section */}
             <div className="!pt-8 border-t-2 border-slate-50 flex flex-col items-center !gap-6">
-              <div className="text-center space-y-1">
-                <Subheading className="!text-[9px] !opacity-80">Total Bayar</Subheading>
-                <Heading as="p" className="!text-lg">
-                  Rp {getTotal().toLocaleString('id-ID')}
-                </Heading>
+              <div className="flex justify-between items-center w-full">
+                <span className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Total Pembayaran</span>
+                <span className="text-lg font-black text-emerald-600">
+                  {formatCurrency(getTotal())}
+                </span>
               </div>
               <Button 
                 variant="emerald"
@@ -164,7 +191,8 @@ export const CartModal = ({
           pointerEvents: isCartOpen ? 'none' : 'auto' 
         }}
         transition={{ duration: 0.4, ease: "circOut" }}
-        className="fixed bottom-6 left-0 right-0 px-6 z-40"
+        className="fixed left-0 right-0 px-6 z-40"
+        style={{ bottom: 'calc(1.5rem + var(--safe-area-inset-bottom))' }}
       >
         <button 
           onClick={() => setIsCartOpen(!isCartOpen)}

@@ -5,6 +5,7 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import Card from "../ui/Card";
 import { Heading, Subheading, Label } from "../ui/Typography";
+import { formatCurrency } from "../../utils/format";
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -12,7 +13,6 @@ function cn(...inputs: ClassValue[]) {
 
 interface ProductCardProps {
   product: Product;
-  idx: number;
   cartItem?: { quantity: number };
   isBestSeller?: boolean;
   onClick: () => void;
@@ -20,7 +20,6 @@ interface ProductCardProps {
 
 export const ProductCard = ({
   product,
-  idx,
   cartItem,
   isBestSeller,
   onClick,
@@ -30,14 +29,11 @@ export const ProductCard = ({
 
   return (
     <Card
-      layout
       variant={cartItem ? "white" : "glass"}
       padding="none"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: idx * 0.05 }}
+      initial={false}
       onClick={onClick}
-      hoverScale
+      hoverScale={false}
       className={cn(
         "!text-left !flex !flex-col !justify-between min-h-[160px] !p-4 !rounded-[2rem] active:scale-95 cursor-pointer !border",
         cartItem
@@ -88,7 +84,7 @@ export const ProductCard = ({
               accentColor === "emerald" ? "text-emerald-700" : "text-amber-700",
             )}
           >
-            Rp {Number((product.basePrice / 1000).toFixed(1))}k
+            {formatCurrency(product.basePrice)}
           </Heading>
         </div>
         <div

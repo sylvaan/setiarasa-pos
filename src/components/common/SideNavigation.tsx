@@ -9,6 +9,7 @@ import {
   Cloud,
   CloudOff,
   Loader2,
+  Package,
 } from "lucide-react";
 import { useCartStore } from "../../store/useCartStore";
 import { IS_PROD } from "../../lib/config";
@@ -75,7 +76,7 @@ export const SideNavigation = ({
                     SetiaRasa
                   </Heading>
                   <Subheading className="!mt-2 !opacity-80">
-                    POS System Martabak V1
+                    POS System Martabak V1.2.0
                   </Subheading>
                 </div>
                 <Button
@@ -89,18 +90,20 @@ export const SideNavigation = ({
               </div>
 
               <div className="space-y-4 !mt-5">
-                <Label className="px-2 mb-4 opacity-60 block">Mode Akses</Label>
+                <Label className="!px-2 !mb-4 opacity-60 block">
+                  Mode Akses
+                </Label>
 
                 {/* Role Switcher */}
-                <div className="flex gap-2 !my-2 bg-slate-50 p-1.5 rounded-2xl border border-slate-200/50">
+                <div className="!flex gap-2 !my-2 !bg-slate-50 !p-1.5 !rounded-2xl !border !border-slate-200/50">
                   <Button
                     variant={activeTab === "staff" ? "emerald" : "ghost"}
                     size="md"
                     fullWidth
                     onClick={() => setActiveTab("staff")}
                     className={cn(
-                      "py-3 text-[10px] !rounded-xl border-none shadow-none",
-                      activeTab !== "staff" && "text-slate-400",
+                      "!py-3 !text-[10px] !rounded-xl !border-none !shadow-none",
+                      activeTab !== "staff" && "!text-slate-400",
                     )}
                   >
                     Staff
@@ -111,19 +114,19 @@ export const SideNavigation = ({
                     fullWidth
                     onClick={() => setActiveTab("owner")}
                     className={cn(
-                      "py-3 text-[10px] !rounded-xl border-none shadow-none",
-                      activeTab !== "owner" && "text-slate-400",
+                      "!py-3 !text-[10px] !rounded-xl !border-none !shadow-none",
+                      activeTab !== "owner" && "!text-slate-400",
                     )}
                   >
                     Owner
                   </Button>
                 </div>
 
-                <Label className="px-2 !mb-2 opacity-60 block">
+                <Label className="!px-2 !mb-2 opacity-60 block">
                   Navigasi Utama
                 </Label>
 
-                <div className="space-y-2">
+                <div className="!space-y-2">
                   {activeTab === "staff" ? (
                     <>
                       <button
@@ -134,8 +137,8 @@ export const SideNavigation = ({
                         className={cn(
                           "w-full flex items-center gap-4 !px-5 !py-4 !rounded-2xl transition-all group relative overflow-hidden active:scale-[0.98]",
                           activeStaffView === "pos"
-                            ? "bg-emerald-50 text-emerald-600 border border-emerald-100 font-bold"
-                            : "text-slate-500 hover:bg-slate-50",
+                            ? "!bg-emerald-50 !text-emerald-600 !border !border-emerald-100 !font-bold"
+                            : "!text-slate-500 !hover:bg-slate-50",
                         )}
                       >
                         <UtensilsCrossed size={18} strokeWidth={2.5} />
@@ -151,8 +154,8 @@ export const SideNavigation = ({
                         className={cn(
                           "w-full flex items-center gap-4 !px-5 !py-4 !rounded-2xl transition-all group relative overflow-hidden active:scale-[0.98]",
                           activeStaffView === "expenses"
-                            ? "bg-emerald-50 text-emerald-600 border border-emerald-100 font-bold"
-                            : "text-slate-500 hover:bg-slate-50",
+                            ? "!bg-emerald-50 !text-emerald-600 !border !border-emerald-100 !font-bold"
+                            : "!text-slate-500 !hover:bg-slate-50",
                         )}
                       >
                         <Wallet size={18} strokeWidth={2.5} />
@@ -168,8 +171,8 @@ export const SideNavigation = ({
                         className={cn(
                           "w-full flex items-center gap-4 !px-5 !py-4 !rounded-2xl transition-all group relative overflow-hidden active:scale-[0.98]",
                           activeStaffView === "history"
-                            ? "bg-emerald-50 text-emerald-600 border border-emerald-100 font-bold"
-                            : "text-slate-500 hover:bg-slate-50",
+                            ? "!bg-emerald-50 !text-emerald-600 !border !border-emerald-100 !font-bold"
+                            : "!text-slate-500 !hover:bg-slate-50",
                         )}
                       >
                         <History size={18} strokeWidth={2.5} />
@@ -200,8 +203,8 @@ export const SideNavigation = ({
                             className={cn(
                               "w-full flex items-center gap-4 !px-5 !py-4 !rounded-2xl transition-all group relative overflow-hidden active:scale-[0.98]",
                               activeOwnerView === "overview"
-                                ? "bg-amber-50 text-amber-700 border border-amber-100 font-bold"
-                                : "text-slate-500 hover:bg-slate-50",
+                                ? "!bg-amber-50 !text-amber-700 !border !border-amber-100 !font-bold"
+                                : "!text-slate-500 !hover:bg-slate-50",
                             )}
                           >
                             <LayoutDashboard size={18} strokeWidth={2.5} />
@@ -217,8 +220,8 @@ export const SideNavigation = ({
                             className={cn(
                               "w-full flex items-center gap-4 !px-5 !py-4 !rounded-2xl transition-all group relative overflow-hidden active:scale-[0.98]",
                               activeOwnerView === "sales"
-                                ? "bg-amber-50 text-amber-700 border border-amber-100 font-bold"
-                                : "text-slate-500 hover:bg-slate-50",
+                                ? "!bg-amber-50 !text-amber-700 !border !border-amber-100 !font-bold"
+                                : "!text-slate-500 !hover:bg-slate-50",
                             )}
                           >
                             <PieChart size={18} strokeWidth={2.5} />
@@ -234,13 +237,30 @@ export const SideNavigation = ({
                             className={cn(
                               "w-full flex items-center gap-4 !px-5 !py-4 !rounded-2xl transition-all group relative overflow-hidden active:scale-[0.98]",
                               activeOwnerView === "history"
-                                ? "bg-amber-50 text-amber-700 border border-amber-100 font-bold"
-                                : "text-slate-500 hover:bg-slate-50",
+                                ? "!bg-amber-50 !text-amber-700 !border !border-amber-100 !font-bold"
+                                : "!text-slate-500 !hover:bg-slate-50",
                             )}
                           >
                             <History size={18} strokeWidth={2.5} />
                             <span className="text-[10px] uppercase tracking-[0.1em] whitespace-nowrap">
                               Riwayat Transaksi
+                            </span>
+                          </button>
+                          <button
+                            onClick={() => {
+                              setActiveOwnerView("catalog");
+                              onClose();
+                            }}
+                            className={cn(
+                              "w-full flex items-center gap-4 !px-5 !py-4 !rounded-2xl transition-all group relative overflow-hidden active:scale-[0.98]",
+                              activeOwnerView === "catalog"
+                                ? "!bg-amber-50 !text-amber-700 !border !border-amber-100 !font-bold"
+                                : "!text-slate-500 !hover:bg-slate-50",
+                            )}
+                          >
+                            <Package size={18} strokeWidth={2.5} />
+                            <span className="text-[10px] uppercase tracking-[0.1em] whitespace-nowrap">
+                              Katalog Menu
                             </span>
                           </button>
                         </>
@@ -282,7 +302,7 @@ export const SideNavigation = ({
                 </div>
               )}
               <p className="!text-center !text-[8px] !text-slate-300 !mt-4 !uppercase !tracking-[0.2em] !font-medium">
-                Martabak SetiaRasa &bull; v1.1.10
+                Martabak SetiaRasa &bull; v1.2.0
               </p>
             </div>
           </motion.div>

@@ -5,7 +5,7 @@
   --bg-color: #E0F2FE; /* Sky 100 */
   --card-bg: rgba(255, 255, 255, 0.7); /* Cloudy White Glass */
   --text-primary: #0F172A; /* Slate 900 */
-  --text-secondary: #64748B; /* Slate 500 */
+  --text-secondary: #475569; /* Slate 600 - Better Contrast */
   
   /* Accents */
   --accent-emerald: #10B981;
@@ -15,7 +15,7 @@
   /* Glassmorphism Cloudy */
   --glass-bg: rgba(255, 255, 255, 0.65);
   --glass-border: rgba(255, 255, 255, 0.4);
-  --glass-blur: blur(16px);
+  --glass-blur: none;
 
   /* Spacing */
   --safe-area-inset-top: env(safe-area-inset-top, 0px);
@@ -70,15 +70,11 @@ body {
 /* Glass Utilities */
 .glass {
   background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
   border: 1px solid var(--glass-border);
 }
 
 .glass-card {
   background: var(--glass-bg);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
   border: 1px solid var(--glass-border);
   border-radius: 1.5rem;
   padding: 1.25rem;

@@ -65,6 +65,12 @@ const OwnerDashboard = ({
         />
       )}
 
+      {activeOwnerView === 'catalog' && (
+        <OwnerCatalog 
+          setActiveOwnerView={setActiveOwnerView}
+        />
+      )}
+
       {/* Global Logout Button */}
       <Button 
         variant="white"
@@ -83,5 +89,6 @@ const OwnerDashboard = ({
 import OwnerOverview from './sections/OwnerOverview'
 import OwnerSales from './sections/OwnerSales'
 import OwnerHistory from './sections/OwnerHistory'
+import OwnerCatalog from './sections/OwnerCatalog'
 
 export default OwnerDashboard

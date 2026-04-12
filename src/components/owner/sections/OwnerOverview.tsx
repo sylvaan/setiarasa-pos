@@ -1,4 +1,5 @@
-import { LayoutDashboard, Wallet, TrendingUp, PieChart, History } from 'lucide-react'
+import { LayoutDashboard, Wallet, TrendingUp, PieChart, History, Package } from 'lucide-react'
+import { formatNumber } from '../../../utils/format'
 import type { Order, OwnerView } from '../../../types'
 import { Heading, Label } from '../../ui/Typography'
 import StatCard from '../../shared/StatCard'
@@ -38,13 +39,13 @@ const OwnerOverview = ({
       <div className="grid grid-cols-2 !gap-5 !px-2">
         <StatCard 
           label="Total Omzet" 
-          value={`Rp ${Number((currentRevenue/1000).toFixed(1))}k`} 
+          value={`Rp ${formatNumber(Math.round(currentRevenue/1000))}k`} 
           icon={TrendingUp} 
           trend="+12%"
         />
         <StatCard 
           label="Pengeluaran" 
-          value={`Rp ${Number((currentExpenses/1000).toFixed(1))}k`} 
+          value={`Rp ${formatNumber(Math.round(currentExpenses/1000))}k`} 
           icon={Wallet} 
           variant="amber"
           trend="-5%"
@@ -57,7 +58,7 @@ const OwnerOverview = ({
         />
         <StatCard 
           label="Profit Bersih" 
-          value={`Rp ${Number((netProfit/1000).toFixed(1))}k`} 
+          value={`Rp ${formatNumber(Math.round(netProfit/1000))}k`} 
           icon={TrendingUp} 
         />
       </div>
@@ -92,6 +93,7 @@ const OwnerOverview = ({
       <div className="!space-y-5 !px-2">
         <Label className="!ml-2 !opacity-60 !mb-2 block uppercase tracking-[0.2em] font-black">Manajemen Data</Label>
         
+        {/* Sales Analytics Card */}
         <div 
           onClick={() => setActiveOwnerView('sales')}
           className={cn(
@@ -110,6 +112,7 @@ const OwnerOverview = ({
           </div>
         </div>
 
+        {/* Transaction History Card */}
         <div 
           onClick={() => setActiveOwnerView('history')}
           className={cn(
@@ -124,6 +127,25 @@ const OwnerOverview = ({
             <div className="text-left">
                <Heading as="h3" className="!text-lg !mb-1">Riwayat Transaksi</Heading>
                <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">Cari Transaksi Lama</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Catalog Management Card */}
+        <div 
+          onClick={() => setActiveOwnerView('catalog')}
+          className={cn(
+            "group relative !p-8 !rounded-[2.5rem] bg-white border border-slate-100 shadow-xl shadow-slate-200/40 overflow-hidden cursor-pointer active:scale-95 transition-all"
+          )}
+        >
+          <div className="absolute top-0 right-0 w-32 h-32 bg-slate-100 rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-150 duration-700" />
+          <div className="relative flex items-center gap-6">
+            <div className="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-slate-200">
+               <Package size={32} />
+            </div>
+            <div className="text-left">
+               <Heading as="h3" className="!text-lg !mb-1">Manajemen Katalog</Heading>
+               <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">Atur Menu & Topping</p>
             </div>
           </div>
         </div>
