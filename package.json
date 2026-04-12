@@ -1,14 +1,14 @@
 {
   "name": "setiarasa-pos",
   "private": true,
-  "version": "1.1.8",
+  "version": "1.1.9",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "mobile:sync": "npm run build && npx cap sync android"
+    "mobile:sync": "node scripts/sync-identity.cjs && npm run build && npx cap sync android"
   },
   "dependencies": {
     "@capacitor/android": "^6.1.2",

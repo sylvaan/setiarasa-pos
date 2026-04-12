@@ -174,7 +174,10 @@ export const DoughSelectorModal = ({
                 variant="emerald"
                 fullWidth
                 size="lg"
-                onClick={() => onAdd(product, activeDough, selectedToppingList)}
+                onClick={() => {
+                  onAdd(product, activeDough, selectedToppingList);
+                  setSelectedToppingIds([]); // Reset for next selection
+                }}
                 className="!mt-1.5 !rounded-[2rem] !text-xs !gap-3 relative"
               >
                 Tambahkan
