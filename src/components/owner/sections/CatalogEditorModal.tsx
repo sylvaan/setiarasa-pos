@@ -159,7 +159,8 @@ const CatalogEditorModal = ({
                 </div>
               )}
 
-              <div className="!pt-4">
+              {/* COMMENTED: M7 Price Regulation - Uncomment if promo logic is needed */}
+              {/* <div className="!pt-4">
                 <button
                   type="button"
                   onClick={() => setFormData({...formData, isSpecialExtra: !formData.isSpecialExtra})}
@@ -184,7 +185,7 @@ const CatalogEditorModal = ({
                     <CheckCircle size={14} />
                   </div>
                 </button>
-              </div>
+              </div> */}
             </>
           ) : (
             <>

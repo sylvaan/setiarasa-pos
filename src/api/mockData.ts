@@ -22,7 +22,7 @@ export const MOCK_PRODUCTS: Product[] = [
   { id: "m4", name: "Ketan Susu", basePrice: 18000, category: "manis" },
   { id: "m5", name: "Oreo Susu", basePrice: 18000, category: "manis" },
   { id: "m6", name: "Cokelat Kacang", basePrice: 20000, category: "manis" },
-  { id: "m7", name: "Keju Susu", basePrice: 23000, category: "manis", isSpecialExtra: true },
+  { id: "m7", name: "Keju Susu", basePrice: 23000, category: "manis", isSpecialExtra: false },
   { id: "m8", name: "Keju Coklat", basePrice: 25000, category: "manis" },
   { id: "m9", name: "Keju Kacang", basePrice: 25000, category: "manis" },
   { id: "m10", name: "Keju Pisang", basePrice: 25000, category: "manis" },
