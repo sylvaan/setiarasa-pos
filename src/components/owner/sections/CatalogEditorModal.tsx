@@ -1,4 +1,4 @@
-import { X, Save, Trash2, Package, Tag, Layers, CheckCircle } from 'lucide-react'
+import { X, Save, Trash2, Package, Tag } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import Button from '../../ui/Button'
 import { Heading, Subheading, Label } from '../../ui/Typography'
