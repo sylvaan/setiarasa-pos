@@ -1,30 +1,40 @@
-import { Menu } from 'lucide-react'
-import { clsx, type ClassValue } from 'clsx'
-import { twMerge } from 'tailwind-merge'
-import { Heading, Subheading } from '../ui/Typography'
-import Button from '../ui/Button'
-import Badge from '../ui/Badge'
+import { Menu, CloudOff } from "lucide-react";
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+import { Heading, Subheading } from "../ui/Typography";
+import Button from "../ui/Button";
+import Badge from "../ui/Badge";
+import { useCartStore } from "../../store/useCartStore";
 
 function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 interface HeaderProps {
-  onMenuClick: () => void
-  activeTab: 'staff' | 'owner'
-  selectedCategory?: string
+  onMenuClick: () => void;
+  activeTab: "staff" | "owner";
+  selectedCategory?: string;
 }
 
-export const Header = ({ onMenuClick, activeTab, selectedCategory }: HeaderProps) => {
-  const isManis = selectedCategory === 'manis' || !selectedCategory
-  
+export const Header = ({
+  onMenuClick,
+  activeTab,
+  selectedCategory,
+}: HeaderProps) => {
+  const isManis = selectedCategory === "manis" || !selectedCategory;
+  const lastSyncFailed = useCartStore((state) => state.lastSyncFailed);
+
   return (
-    <header className={cn(
-      "!pt-5 !pb-6 !px-7 flex justify-between items-center w-full sticky top-0 z-30 border-b shadow-sm transition-all duration-300",
-      isManis ? "!bg-emerald-50 border-emerald-100/50" : "!bg-amber-50 border-amber-100/50"
-    )}>
+    <header
+      className={cn(
+        "!pt-5 !pb-6 !px-7 flex justify-between items-center w-full sticky top-0 z-30 border-b shadow-sm transition-all duration-300",
+        isManis
+          ? "!bg-emerald-50 border-emerald-100/50"
+          : "!bg-amber-50 border-amber-100/50",
+      )}
+    >
       <div className="flex items-center !gap-5">
-        <Button 
+        <Button
           variant="white"
           size="sm"
           onClick={onMenuClick}
@@ -33,18 +43,41 @@ export const Header = ({ onMenuClick, activeTab, selectedCategory }: HeaderProps
           <Menu size={22} strokeWidth={2.5} />
         </Button>
         <div className="!text-left !py-1">
-          <Heading as="h1" className={cn(
-            "!text-2xl transition-colors duration-1000",
-            isManis ? "!text-emerald-600" : "!text-amber-600"
-          )}>SetiaRasa</Heading>
-          <Subheading className="!mt-1.5 opacity-80 pl-0.5">POS System Martabak</Subheading>
+          <div className="flex items-center gap-2">
+            <Heading
+              as="h1"
+              className={cn(
+                "!text-2xl transition-colors duration-1000",
+                isManis ? "!text-emerald-600" : "!text-amber-600",
+              )}
+            >
+              SetiaRasa
+            </Heading>
+            {lastSyncFailed && (
+              <div
+                className="!flex !items-center !gap-1.5 !px-2 !py-1 !bg-amber-100 !text-amber-700 !rounded-lg !animate-pulse"
+                title="Mode Offline - Data mungkin tidak terbaru"
+              >
+                <CloudOff size={14} strokeWidth={2.5} />
+                <span className="!text-[8px] !font-black !uppercase !tracking-tighter">
+                  Offline
+                </span>
+              </div>
+            )}
+          </div>
+          <Subheading className="!mt-1.5 opacity-80 !pl-0.5">
+            POS System Martabak
+          </Subheading>
         </div>
       </div>
       <div className="flex items-center !gap-3">
-        <Badge variant={activeTab === 'staff' ? 'emerald' : 'amber'} className="!px-4 !py-2 !rounded-full shadow-sm text-[9px] font-black uppercase tracking-widest transition-all">
-          {activeTab === 'owner' ? 'Owner Mode' : 'Kasir Melayani'}
+        <Badge
+          variant={activeTab === "staff" ? "emerald" : "amber"}
+          className="!px-4 !py-2 !rounded-full shadow-sm !text-[9px] !font-black !uppercase !tracking-widest !transition-all"
+        >
+          {activeTab === "owner" ? "Owner Mode" : "Kasir Melayani"}
         </Badge>
       </div>
     </header>
-  )
-}
+  );
+};

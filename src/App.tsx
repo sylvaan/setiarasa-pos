@@ -35,7 +35,9 @@ import LoadingState from "./components/common/LoadingState";
 
 // Lazy loaded components
 const ExpenseSection = lazy(() => import("./components/staff/ExpenseSection"));
-const StaffHistory = lazy(() => import("./components/staff/sections/StaffHistory"));
+const StaffHistory = lazy(
+  () => import("./components/staff/sections/StaffHistory"),
+);
 const OwnerAuth = lazy(() => import("./components/owner/OwnerAuth"));
 const OwnerDashboard = lazy(() => import("./components/owner/OwnerDashboard"));
 
@@ -97,7 +99,6 @@ export default function App() {
     fetchInitialData();
   }, [fetchInitialData]);
 
-
   // Security: Auto logout owner after 1 hour
   useEffect(() => {
     if (!isOwnerAuthenticated || !ownerAuthTime) return;
@@ -121,14 +122,14 @@ export default function App() {
   const handlePinInput = useCallback(
     async (num: string) => {
       if (isPinError) return;
-      
+
       // Update local UI state
       const nextPin = pinInput + num;
       setPinInput(nextPin);
 
       if (nextPin.length === 6) {
         const isValid = await verifyOwnerPin(nextPin);
-        
+
         if (isValid) {
           setOwnerAuthTime(Date.now());
           setIsOwnerAuthenticated(true);
@@ -215,10 +216,13 @@ export default function App() {
     setSelectedProductForDough(null);
   };
 
-  const showNotification = (message: string, type: NotificationType = 'success') => {
+  const showNotification = (
+    message: string,
+    type: NotificationType = "success",
+  ) => {
     setNotification({ visible: true, message, type });
     setTimeout(() => {
-      setNotification(prev => ({ ...prev, visible: false }));
+      setNotification((prev) => ({ ...prev, visible: false }));
     }, 3000);
   };
 
@@ -281,7 +285,7 @@ export default function App() {
         selectedCategory={selectedCategory}
       />
 
-      <main className="mt-10 !mb-10 min-h-[calc(100vh-200px)]">
+      <main className="!mt-10 !mb-10 min-h-[calc(100vh-200px)]">
         <Suspense fallback={<LoadingState />}>
           {activeTab === "staff" ? (
             activeStaffView === "pos" ? (
@@ -321,6 +325,7 @@ export default function App() {
               salesTrend={salesTrendList}
               analyticsRange={analyticsRange}
               setAnalyticsRange={setAnalyticsRange}
+              showNotification={showNotification}
               onLogout={() => {
                 setIsOwnerAuthenticated(false);
                 setPinInput("");

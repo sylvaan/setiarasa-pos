@@ -14,6 +14,7 @@ interface OwnerDashboardProps {
   analyticsRange: 'today' | 'week' | 'month'
   setAnalyticsRange: (range: 'today' | 'week' | 'month') => void
   onLogout: () => void
+  showNotification: (message: string, type?: "success" | "error") => void
 }
 
 const OwnerDashboard = ({
@@ -26,7 +27,8 @@ const OwnerDashboard = ({
   salesTrend,
   analyticsRange,
   setAnalyticsRange,
-  onLogout
+  onLogout,
+  showNotification
 }: OwnerDashboardProps) => {
   
   // High-level Financial Calculations
@@ -68,6 +70,7 @@ const OwnerDashboard = ({
       {activeOwnerView === 'catalog' && (
         <OwnerCatalog 
           setActiveOwnerView={setActiveOwnerView}
+          showNotification={showNotification}
         />
       )}
 

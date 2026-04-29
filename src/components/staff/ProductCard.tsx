@@ -1,3 +1,4 @@
+import { forwardRef } from "react";
 import { motion } from "framer-motion";
 import { Plus, Crown } from "lucide-react";
 import type { Product } from "../../types";
@@ -18,17 +19,18 @@ interface ProductCardProps {
   onClick: () => void;
 }
 
-export const ProductCard = ({
+export const ProductCard = forwardRef<HTMLDivElement, ProductCardProps>(({
   product,
   cartItem,
   isBestSeller,
   onClick,
-}: ProductCardProps) => {
+}, ref) => {
   const isManis = product.category === "manis";
   const accentColor = isManis ? "emerald" : "amber";
 
   return (
     <Card
+      ref={ref}
       variant={cartItem ? "white" : "glass"}
       padding="none"
       initial={false}
@@ -108,4 +110,6 @@ export const ProductCard = ({
       )}
     </Card>
   );
-};
+})
+
+ProductCard.displayName = 'ProductCard'

@@ -5,6 +5,7 @@ import { Heading, Subheading, Label } from '../../ui/Typography'
 import { motion } from 'framer-motion'
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
+import { useCartStore } from '../../../store/useCartStore'
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -28,6 +29,7 @@ const CatalogEditorModal = ({
   initialData
 }: CatalogEditorModalProps) => {
   const [formData, setFormData] = useState<any>({})
+  const isSyncing = useCartStore(state => state.isSyncing)
 
   useEffect(() => {
     if (initialData) {
@@ -47,8 +49,13 @@ const CatalogEditorModal = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    await onSave(formData)
-    onClose()
+    try {
+      await onSave(formData)
+      onClose()
+    } catch (err) {
+      // Error is handled by the parent's notification
+      console.error("Save failed:", err)
+    }
   }
 
   if (!isOpen) return null
@@ -222,20 +229,26 @@ const CatalogEditorModal = ({
                fullWidth
                size="xl"
                className="!rounded-[1.5rem]"
+               disabled={isSyncing}
             >
-              <Save size={18} className="mr-2" /> Simpan Perubahan
+              <Save size={18} className="mr-2" /> {isSyncing ? "Menyimpan..." : "Simpan Perubahan"}
             </Button>
 
             {initialData && onDelete && (
               <button
                 type="button"
-                onClick={() => {
+                disabled={isSyncing}
+                onClick={async () => {
                   if(confirm('Hapus item ini permanen?')) {
-                    onDelete(initialData.id)
-                    onClose()
+                    try {
+                      await onDelete(initialData.id)
+                      onClose()
+                    } catch (err) {
+                      console.error("Delete failed:", err)
+                    }
                   }
                 }}
-                className="w-full p-4 flex items-center justify-center gap-2 text-rose-500 text-[10px] font-black uppercase tracking-widest hover:bg-rose-50 rounded-2xl transition-all"
+                className="w-full p-4 flex items-center justify-center gap-2 text-rose-500 text-[10px] font-black uppercase tracking-widest hover:bg-rose-50 disabled:opacity-50 rounded-2xl transition-all"
               >
                 <Trash2 size={14} /> Hapus Item
               </button>

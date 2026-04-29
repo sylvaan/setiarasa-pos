@@ -20,6 +20,7 @@ interface CartStore {
   doughOptions: DoughOption[];
   toppingOptions: ToppingOption[];
   isSyncing: boolean;
+  lastSyncFailed: boolean;
   addItem: (
     product: Product,
     selectedDough?: DoughOption,
@@ -81,6 +82,7 @@ export const useCartStore = create<CartStore>()(
       doughOptions: DOUGH_OPTIONS, // Default to Mock
       toppingOptions: MOCK_TOPPINGS,
       isSyncing: false,
+      lastSyncFailed: false,
       lastRemovedItem: null,
       addItem: (product, selectedDough, selectedToppings = []) =>
         set((state) => {
@@ -138,7 +140,7 @@ export const useCartStore = create<CartStore>()(
           };
           return { items: [...state.items, newItem] };
         }),
-      removeItem: (itemId) =>
+      removeItem: (itemId) => {
         set((state) => {
           const existing = state.items.find((i) => {
             const iDoughId = i.selectedDough?.id || "none";
@@ -203,7 +205,13 @@ export const useCartStore = create<CartStore>()(
               return `${i.id}-${iDoughId}-${iToppingIds}` !== itemId;
             }),
           };
-        }),
+        });
+
+        // Auto-clear undo notification after 4 seconds
+        setTimeout(() => {
+          set({ lastRemovedItem: null });
+        }, 4000);
+      },
       undoRemoveItem: () =>
         set((state) => {
           if (!state.lastRemovedItem) return state;
@@ -233,38 +241,54 @@ export const useCartStore = create<CartStore>()(
 
         // Sync if Production
         if (IS_PROD && supabase) {
-          await syncOrder(newOrder);
+          const { error: orderError } = await syncOrder(newOrder);
+          if (orderError) {
+            set({ isSyncing: false });
+            throw new Error(orderError.message);
+          }
 
           // Increment sales count for each product in the order
           for (const item of items) {
-            const { error } = await supabase.rpc("increment_sales", {
+            const { error: rpcError } = await supabase.rpc("increment_sales", {
               prod_id: item.id,
               qty: item.quantity,
             });
 
             // Fallback if RPC doesn't exist
-            if (error) {
-              const { data } = await supabase
+            if (rpcError) {
+              const { data, error: selectError } = await supabase
                 .from("products")
                 .select("sales_count")
                 .eq("id", item.id)
                 .single();
+
+              if (selectError) {
+                console.error("Error fetching sales count:", selectError);
+                continue;
+              }
+
               if (data) {
-                await supabase
+                const { error: updateError } = await supabase
                   .from("products")
                   .update({
                     sales_count: (data.sales_count || 0) + item.quantity,
                   })
                   .eq("id", item.id);
+                
+                if (updateError) console.error("Error updating sales count:", updateError);
               }
             }
           }
+        } else {
+          // Artificial delay for Demo mode to show loading states
+          await new Promise((resolve) => setTimeout(resolve, 800));
         }
 
         set((state) => ({
           orders: [newOrder, ...state.orders],
           items: [],
           isSyncing: false,
+          lastSyncFailed: false,
         }));
       },
       addExpense: async (title, amount, category) => {
@@ -278,12 +302,20 @@ export const useCartStore = create<CartStore>()(
 
         set({ isSyncing: true });
         if (IS_PROD) {
-          await syncExpense(newExpense);
+          const { error } = await syncExpense(newExpense);
+          if (error) {
+            set({ isSyncing: false });
+            throw new Error(error.message);
+          }
+        } else {
+          // Artificial delay for Demo mode
+          await new Promise((resolve) => setTimeout(resolve, 800));
         }
 
         set((state) => ({
           expenses: [newExpense, ...state.expenses],
           isSyncing: false,
+          lastSyncFailed: false,
         }));
       },
       removeExpense: (expenseId) =>
@@ -318,9 +350,10 @@ export const useCartStore = create<CartStore>()(
               ...o,
               totalAmount: o.total_amount, // Remap snake_case to camelCase
             })),
+            lastSyncFailed: false,
           });
         }
-        if (exps) set({ expenses: exps });
+        if (exps) set({ expenses: exps, lastSyncFailed: false });
       },
       fetchProducts: async () => {
         if (!IS_PROD || !supabase) {
@@ -333,7 +366,13 @@ export const useCartStore = create<CartStore>()(
           .select("*")
           .order("sales_count", { ascending: false }); // NEW: Sort by popularity
 
-        if (data && !error) {
+        if (error) {
+          set({ lastSyncFailed: true });
+          console.error("Fetch products error:", error);
+          return;
+        }
+
+        if (data) {
           set({
             products: data.map((p) => ({
               id: p.id,
@@ -345,6 +384,7 @@ export const useCartStore = create<CartStore>()(
               isSpecialExtra: p.is_special_extra,
               salesCount: p.sales_count, // NEW: Map from DB
             })),
+            lastSyncFailed: false,
           });
         }
       },
@@ -357,16 +397,22 @@ export const useCartStore = create<CartStore>()(
         const { data, error } = await supabase
           .from("dough_options")
           .select("*");
-        if (data && !error) {
+        
+        if (error) {
+          set({ lastSyncFailed: true });
+          set({ doughOptions: DOUGH_OPTIONS }); // Fallback
+          return;
+        }
+
+        if (data) {
           set({
             doughOptions: data.map((d) => ({
               id: d.id,
               label: d.label,
               extraPrice: Number(d.extra_price),
             })),
+            lastSyncFailed: false,
           });
-        } else {
-          set({ doughOptions: DOUGH_OPTIONS }); // Fallback
         }
       },
       fetchToppingOptions: async () => {
@@ -378,13 +424,20 @@ export const useCartStore = create<CartStore>()(
         const { data, error } = await supabase
           .from("topping_options")
           .select("*");
-        if (data && !error) {
+
+        if (error) {
+          set({ lastSyncFailed: true });
+          return;
+        }
+
+        if (data) {
           set({
             toppingOptions: data.map((t) => ({
               id: t.id,
               label: t.label,
               price: Number(t.price),
             })),
+            lastSyncFailed: false,
           });
         }
       },
@@ -422,10 +475,11 @@ export const useCartStore = create<CartStore>()(
         if (IS_PROD && supabase) {
           const { error } = await supabase.from("products").upsert(dbProduct);
           if (error) {
-            console.error("Error upserting product:", error);
             set({ isSyncing: false });
-            return;
+            throw new Error(error.message);
           }
+        } else {
+          await new Promise((resolve) => setTimeout(resolve, 800));
         }
 
         // Update local state
@@ -450,7 +504,7 @@ export const useCartStore = create<CartStore>()(
             newProducts.push(fullProduct);
           }
 
-          return { products: newProducts, isSyncing: false };
+          return { products: newProducts, isSyncing: false, lastSyncFailed: false };
         });
       },
       deleteProduct: async (id) => {
@@ -461,15 +515,17 @@ export const useCartStore = create<CartStore>()(
             .delete()
             .eq("id", id);
           if (error) {
-            console.error("Error deleting product:", error);
             set({ isSyncing: false });
-            return;
+            throw new Error(error.message);
           }
+        } else {
+          await new Promise((resolve) => setTimeout(resolve, 800));
         }
 
         set((state) => ({
           products: state.products.filter((p) => p.id !== id),
           isSyncing: false,
+          lastSyncFailed: false,
         }));
       },
       upsertTopping: async (topping) => {
@@ -487,10 +543,11 @@ export const useCartStore = create<CartStore>()(
             .from("topping_options")
             .upsert(dbTopping);
           if (error) {
-            console.error("Error upserting topping:", error);
             set({ isSyncing: false });
-            return;
+            throw new Error(error.message);
           }
+        } else {
+          await new Promise((resolve) => setTimeout(resolve, 800));
         }
 
         set((state) => {
@@ -508,7 +565,7 @@ export const useCartStore = create<CartStore>()(
             newToppings.push(fullTopping);
           }
 
-          return { toppingOptions: newToppings, isSyncing: false };
+          return { toppingOptions: newToppings, isSyncing: false, lastSyncFailed: false };
         });
       },
       deleteTopping: async (id) => {
@@ -519,15 +576,17 @@ export const useCartStore = create<CartStore>()(
             .delete()
             .eq("id", id);
           if (error) {
-            console.error("Error deleting topping:", error);
             set({ isSyncing: false });
-            return;
+            throw new Error(error.message);
           }
+        } else {
+          await new Promise((resolve) => setTimeout(resolve, 800));
         }
 
         set((state) => ({
           toppingOptions: state.toppingOptions.filter((t) => t.id !== id),
           isSyncing: false,
+          lastSyncFailed: false,
         }));
       },
     }),

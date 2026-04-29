@@ -23,9 +23,10 @@ function cn(...inputs: ClassValue[]) {
 
 interface OwnerCatalogProps {
   setActiveOwnerView: (view: OwnerView) => void;
+  showNotification: (message: string, type?: "success" | "error") => void;
 }
 
-const OwnerCatalog = ({ setActiveOwnerView }: OwnerCatalogProps) => {
+const OwnerCatalog = ({ setActiveOwnerView, showNotification }: OwnerCatalogProps) => {
   const {
     products,
     toppingOptions,
@@ -255,12 +256,24 @@ const OwnerCatalog = ({ setActiveOwnerView }: OwnerCatalogProps) => {
         type={tab === "products" ? "product" : "topping"}
         initialData={editingItem}
         onSave={async (data) => {
-          if (tab === "products") await upsertProduct(data);
-          else await upsertTopping(data);
+          try {
+            if (tab === "products") await upsertProduct(data);
+            else await upsertTopping(data);
+            showNotification("Data berhasil disimpan!");
+          } catch (error: any) {
+            showNotification(error.message || "Gagal menyimpan data", "error");
+            throw error; // Rethrow to prevent modal close
+          }
         }}
         onDelete={async (id) => {
-          if (tab === "products") await deleteProduct(id);
-          else await deleteTopping(id);
+          try {
+            if (tab === "products") await deleteProduct(id);
+            else await deleteTopping(id);
+            showNotification("Data berhasil dihapus!");
+          } catch (error: any) {
+            showNotification(error.message || "Gagal menghapus data", "error");
+            throw error; // Rethrow to prevent modal close
+          }
         }}
       />
     </div>
