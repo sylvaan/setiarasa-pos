@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, ShoppingCart, ChevronRight } from 'lucide-react'
+import { useEffect } from 'react'
 import type { Product, CartItem, DoughOption, ToppingOption } from '../../types'
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
@@ -25,6 +26,7 @@ interface CartModalProps {
   isSyncing?: boolean
   lastRemovedItem: any | null
   undoRemoveItem: () => void
+  setLastRemovedItem: (item: any | null) => void // Add this prop
 }
 
 export const CartModal = ({
@@ -37,8 +39,18 @@ export const CartModal = ({
   checkout,
   isSyncing = false,
   lastRemovedItem,
-  undoRemoveItem
+  undoRemoveItem,
+  setLastRemovedItem
 }: CartModalProps) => {
+  useEffect(() => {
+    if (lastRemovedItem) {
+      const timer = setTimeout(() => {
+        setLastRemovedItem(null)
+      }, 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [lastRemovedItem, setLastRemovedItem])
+
   return (
     <AnimatePresence>
       {items.length > 0 && (

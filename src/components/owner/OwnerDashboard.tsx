@@ -1,7 +1,8 @@
 import { X } from 'lucide-react'
-import type { Order, OwnerView, Expense } from '../../types'
+import type { Order, OwnerView, Expense, Product, CartItem } from '../../types'
 import { calculateRevenue, calculateExpenses } from '../../utils/analytics'
 import Button from '../ui/Button'
+import { useCartStore } from '../../store/useCartStore'
 
 interface OwnerDashboardProps {
   activeOwnerView: OwnerView
@@ -30,6 +31,7 @@ const OwnerDashboard = ({
   onLogout,
   showNotification
 }: OwnerDashboardProps) => {
+  const { products, manualInjectOrder, manualInjectExpense, isSyncing } = useCartStore()
   
   // High-level Financial Calculations
   const currentRevenue = calculateRevenue(orders, analyticsRange)
@@ -74,6 +76,17 @@ const OwnerDashboard = ({
         />
       )}
 
+      {activeOwnerView === 'manual-entry' && (
+        <ManualEntry 
+          setActiveOwnerView={setActiveOwnerView}
+          products={products}
+          manualInjectOrder={manualInjectOrder}
+          manualInjectExpense={manualInjectExpense}
+          isSyncing={isSyncing}
+          showNotification={showNotification}
+        />
+      )}
+
       {/* Global Logout Button */}
       <Button 
         variant="white"
@@ -93,5 +106,6 @@ import OwnerOverview from './sections/OwnerOverview'
 import OwnerSales from './sections/OwnerSales'
 import OwnerHistory from './sections/OwnerHistory'
 import OwnerCatalog from './sections/OwnerCatalog'
+import ManualEntry from './sections/ManualEntry'
 
 export default OwnerDashboard

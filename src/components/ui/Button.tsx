@@ -8,7 +8,7 @@ function cn(...inputs: ClassValue[]) {
 }
 
 interface ButtonProps extends Omit<HTMLMotionProps<"button">, "children"> {
-  variant?: 'emerald' | 'amber' | 'white' | 'ghost' | 'slate'
+  variant?: 'emerald' | 'amber' | 'white' | 'ghost' | 'slate' | 'rose'
   size?: 'sm' | 'md' | 'lg' | 'xl'
   fullWidth?: boolean
   children?: ReactNode
@@ -28,7 +28,8 @@ const Button = ({
     amber: "!bg-amber-600 !text-white !shadow-lg !shadow-amber-500/20 !hover:bg-amber-700 !border-amber-500",
     white: "!bg-white !text-slate-700 !shadow-sm !hover:bg-slate-50 !border-slate-100",
     ghost: "!bg-transparent !text-slate-500 !hover:bg-slate-50 !border-transparent !shadow-none",
-    slate: "!bg-slate-800 !text-white !shadow-lg !shadow-slate-900/10 !hover:bg-slate-900 !border-slate-700"
+    slate: "!bg-slate-800 !text-white !shadow-lg !shadow-slate-900/10 !hover:bg-slate-900 !border-slate-700",
+    rose: "!bg-rose-600 !text-white !shadow-lg !shadow-rose-500/20 !hover:bg-rose-700 !border-rose-500"
   }
 
   const sizes = {

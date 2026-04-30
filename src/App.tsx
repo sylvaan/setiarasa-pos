@@ -93,6 +93,7 @@ export default function App() {
     isSyncing,
     lastRemovedItem,
     undoRemoveItem,
+    setLastRemovedItem,
   } = useCartStore();
 
   useEffect(() => {
@@ -183,7 +184,29 @@ export default function App() {
   }, [isCartOpen, selectedProductForDough, activeTab]);
 
   // Analytics Helpers
-  const todayOrders = useMemo(() => getTodayOrders(orders), [orders]);
+  const filteredOrders = useMemo(() => {
+    const now = new Date();
+    if (analyticsRange === "today") {
+      const today = now.toDateString();
+      return orders.filter(
+        (o) => new Date(o.timestamp).toDateString() === today,
+      );
+    } else if (analyticsRange === "week") {
+      const weekAgo = new Date();
+      weekAgo.setDate(now.getDate() - 7);
+      return orders.filter(
+        (o) => new Date(o.timestamp).getTime() >= weekAgo.getTime(),
+      );
+    } else if (analyticsRange === "month") {
+      const monthAgo = new Date();
+      monthAgo.setMonth(now.getMonth() - 1);
+      return orders.filter(
+        (o) => new Date(o.timestamp).getTime() >= monthAgo.getTime(),
+      );
+    }
+    return orders;
+  }, [orders, analyticsRange]);
+
   const topProductsList = useMemo(
     () => getTopProducts(orders, analyticsRange),
     [orders, analyticsRange],
@@ -318,7 +341,7 @@ export default function App() {
             <OwnerDashboard
               activeOwnerView={activeOwnerView}
               setActiveOwnerView={setActiveOwnerView}
-              todayOrders={todayOrders}
+              todayOrders={filteredOrders}
               orders={orders}
               expenses={expenses}
               topProducts={topProductsList}
@@ -369,6 +392,7 @@ export default function App() {
           isSyncing={isSyncing}
           lastRemovedItem={lastRemovedItem}
           undoRemoveItem={undoRemoveItem}
+          setLastRemovedItem={setLastRemovedItem}
         />
       )}
 

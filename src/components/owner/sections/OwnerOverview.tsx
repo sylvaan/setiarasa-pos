@@ -1,4 +1,4 @@
-import { LayoutDashboard, Wallet, TrendingUp, PieChart, History, Package } from 'lucide-react'
+import { LayoutDashboard, Wallet, TrendingUp, PieChart, History, Package, Database } from 'lucide-react'
 import { formatNumber } from '../../../utils/format'
 import type { Order, OwnerView } from '../../../types'
 import { Heading, Label } from '../../ui/Typography'
@@ -131,21 +131,21 @@ const OwnerOverview = ({
           </div>
         </div>
 
-        {/* Catalog Management Card */}
+        {/* Manual Data Injection Card */}
         <div 
-          onClick={() => setActiveOwnerView('catalog')}
+          onClick={() => setActiveOwnerView('manual-entry')}
           className={cn(
             "group relative !p-8 !rounded-[2.5rem] bg-white border border-slate-100 shadow-xl shadow-slate-200/40 overflow-hidden cursor-pointer active:scale-95 transition-all"
           )}
         >
-          <div className="absolute top-0 right-0 w-32 h-32 bg-slate-100 rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-150 duration-700" />
+          <div className="absolute top-0 right-0 w-32 h-32 bg-rose-50 rounded-full -mr-16 -mt-16 transition-transform group-hover:scale-150 duration-700" />
           <div className="relative flex items-center gap-6">
-            <div className="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-slate-200">
-               <Package size={32} />
+            <div className="w-16 h-16 bg-rose-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-rose-200">
+               <Database size={32} />
             </div>
             <div className="text-left">
-               <Heading as="h3" className="!text-lg !mb-1">Manajemen Katalog</Heading>
-               <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">Atur Menu & Topping</p>
+               <Heading as="h3" className="!text-lg !mb-1">Input Manual</Heading>
+               <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">Inject Data ke Database</p>
             </div>
           </div>
         </div>

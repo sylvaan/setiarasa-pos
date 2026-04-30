@@ -48,6 +48,18 @@ interface CartStore {
   deleteTopping: (id: string) => Promise<void>;
   lastRemovedItem: { item: CartItem; index: number } | null;
   undoRemoveItem: () => void;
+  manualInjectOrder: (
+    items: CartItem[],
+    totalAmount: number,
+    timestamp: string,
+  ) => Promise<void>;
+  manualInjectExpense: (
+    title: string,
+    amount: number,
+    timestamp: string,
+    category?: string,
+  ) => Promise<void>;
+  setLastRemovedItem: (item: { item: CartItem; index: number } | null) => void;
 }
 
 const calculateItemPrice = (
@@ -206,11 +218,6 @@ export const useCartStore = create<CartStore>()(
             }),
           };
         });
-
-        // Auto-clear undo notification after 4 seconds
-        setTimeout(() => {
-          set({ lastRemovedItem: null });
-        }, 4000);
       },
       undoRemoveItem: () =>
         set((state) => {
@@ -589,6 +596,58 @@ export const useCartStore = create<CartStore>()(
           lastSyncFailed: false,
         }));
       },
+      manualInjectOrder: async (items, totalAmount, timestamp) => {
+        const newOrder: Order = {
+          id: `OR-MAN-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+          timestamp,
+          items: [...items],
+          totalAmount,
+        };
+
+        set({ isSyncing: true });
+        if (IS_PROD && supabase) {
+          const { error } = await syncOrder(newOrder);
+          if (error) {
+            set({ isSyncing: false });
+            throw new Error(error.message);
+          }
+        } else {
+          await new Promise((resolve) => setTimeout(resolve, 800));
+        }
+
+        set((state) => ({
+          orders: [newOrder, ...state.orders],
+          isSyncing: false,
+          lastSyncFailed: false,
+        }));
+      },
+      manualInjectExpense: async (title, amount, timestamp, category = "bahan") => {
+        const newExpense: Expense = {
+          id: `EX-MAN-${Date.now()}`,
+          timestamp,
+          title,
+          amount,
+          category,
+        };
+
+        set({ isSyncing: true });
+        if (IS_PROD && supabase) {
+          const { error } = await syncExpense(newExpense);
+          if (error) {
+            set({ isSyncing: false });
+            throw new Error(error.message);
+          }
+        } else {
+          await new Promise((resolve) => setTimeout(resolve, 800));
+        }
+
+        set((state) => ({
+          expenses: [newExpense, ...state.expenses],
+          isSyncing: false,
+          lastSyncFailed: false,
+        }));
+      },
+      setLastRemovedItem: (item) => set({ lastRemovedItem: item }),
     }),
     { name: "setiarasa-cart-v3" }, // Bump version due to structural change
   ),
