@@ -1,21 +1,26 @@
-import { X } from 'lucide-react'
-import type { Order, OwnerView, Expense, Product, CartItem } from '../../types'
-import { calculateRevenue, calculateExpenses } from '../../utils/analytics'
-import Button from '../ui/Button'
-import { useCartStore } from '../../store/useCartStore'
+import { X } from "lucide-react";
+import type { Order, OwnerView, Expense } from "../../types";
+import { calculateRevenue, calculateExpenses } from "../../utils/analytics";
+import Button from "../ui/Button";
+import { useCartStore } from "../../store/useCartStore";
 
 interface OwnerDashboardProps {
-  activeOwnerView: OwnerView
-  setActiveOwnerView: (view: OwnerView) => void
-  todayOrders: Order[]
-  orders: Order[]
-  expenses: Expense[]
-  topProducts: { name: string, count: number, dough?: string }[]
-  salesTrend: { label: string, timestamp: number, amount: number, isToday?: boolean }[]
-  analyticsRange: 'today' | 'week' | 'month'
-  setAnalyticsRange: (range: 'today' | 'week' | 'month') => void
-  onLogout: () => void
-  showNotification: (message: string, type?: "success" | "error") => void
+  activeOwnerView: OwnerView;
+  setActiveOwnerView: (view: OwnerView) => void;
+  todayOrders: Order[];
+  orders: Order[];
+  expenses: Expense[];
+  topProducts: { name: string; count: number; dough?: string }[];
+  salesTrend: {
+    label: string;
+    timestamp: number;
+    amount: number;
+    isToday?: boolean;
+  }[];
+  analyticsRange: "today" | "week" | "month";
+  setAnalyticsRange: (range: "today" | "week" | "month") => void;
+  onLogout: () => void;
+  showNotification: (message: string, type?: "success" | "error") => void;
 }
 
 const OwnerDashboard = ({
@@ -29,20 +34,20 @@ const OwnerDashboard = ({
   analyticsRange,
   setAnalyticsRange,
   onLogout,
-  showNotification
+  showNotification,
 }: OwnerDashboardProps) => {
-  const { products, manualInjectOrder, manualInjectExpense, isSyncing } = useCartStore()
-  
+  const { products, manualInjectOrder, manualInjectExpense, isSyncing } =
+    useCartStore();
+
   // High-level Financial Calculations
-  const currentRevenue = calculateRevenue(orders, analyticsRange)
-  const currentExpenses = calculateExpenses(expenses, analyticsRange)
-  const netProfit = currentRevenue - currentExpenses
+  const currentRevenue = calculateRevenue(orders, analyticsRange);
+  const currentExpenses = calculateExpenses(expenses, analyticsRange);
+  const netProfit = currentRevenue - currentExpenses;
 
   return (
     <div className="!py-6 animate-in fade-in slide-in-from-bottom-4 duration-500 !space-y-8 max-w-[440px] !mx-auto w-full px-2">
-      
-      {activeOwnerView === 'overview' && (
-        <OwnerOverview 
+      {activeOwnerView === "overview" && (
+        <OwnerOverview
           todayOrders={todayOrders}
           analyticsRange={analyticsRange}
           setAnalyticsRange={setAnalyticsRange}
@@ -54,8 +59,8 @@ const OwnerDashboard = ({
         />
       )}
 
-      {activeOwnerView === 'sales' && (
-        <OwnerSales 
+      {activeOwnerView === "sales" && (
+        <OwnerSales
           topProducts={topProducts}
           analyticsRange={analyticsRange}
           setAnalyticsRange={setAnalyticsRange}
@@ -63,21 +68,19 @@ const OwnerDashboard = ({
         />
       )}
 
-      {activeOwnerView === 'history' && (
-        <OwnerHistory 
-          setActiveOwnerView={setActiveOwnerView}
-        />
+      {activeOwnerView === "history" && (
+        <OwnerHistory setActiveOwnerView={setActiveOwnerView} />
       )}
 
-      {activeOwnerView === 'catalog' && (
-        <OwnerCatalog 
+      {activeOwnerView === "catalog" && (
+        <OwnerCatalog
           setActiveOwnerView={setActiveOwnerView}
           showNotification={showNotification}
         />
       )}
 
-      {activeOwnerView === 'manual-entry' && (
-        <ManualEntry 
+      {activeOwnerView === "manual-entry" && (
+        <ManualEntry
           setActiveOwnerView={setActiveOwnerView}
           products={products}
           manualInjectOrder={manualInjectOrder}
@@ -88,7 +91,7 @@ const OwnerDashboard = ({
       )}
 
       {/* Global Logout Button */}
-      <Button 
+      <Button
         variant="white"
         fullWidth
         size="lg"
@@ -98,14 +101,14 @@ const OwnerDashboard = ({
         <X size={14} className="opacity-50" /> Keluar Mode Owner
       </Button>
     </div>
-  )
-}
+  );
+};
 
 // Sub-sections
-import OwnerOverview from './sections/OwnerOverview'
-import OwnerSales from './sections/OwnerSales'
-import OwnerHistory from './sections/OwnerHistory'
-import OwnerCatalog from './sections/OwnerCatalog'
-import ManualEntry from './sections/ManualEntry'
+import OwnerOverview from "./sections/OwnerOverview";
+import OwnerSales from "./sections/OwnerSales";
+import OwnerHistory from "./sections/OwnerHistory";
+import OwnerCatalog from "./sections/OwnerCatalog";
+import ManualEntry from "./sections/ManualEntry";
 
-export default OwnerDashboard
+export default OwnerDashboard;

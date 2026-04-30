@@ -42,11 +42,7 @@ const OwnerAuth = lazy(() => import("./components/owner/OwnerAuth"));
 const OwnerDashboard = lazy(() => import("./components/owner/OwnerDashboard"));
 
 // Utils
-import {
-  getTodayOrders,
-  getTopProducts,
-  getSalesTrend,
-} from "./utils/analytics";
+import { getTopProducts, getSalesTrend } from "./utils/analytics";
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<"staff" | "owner">("staff");

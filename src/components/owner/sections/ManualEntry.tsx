@@ -48,7 +48,6 @@ const ManualEntry = ({
   const [expenseAmount, setExpenseAmount] = useState("");
 
   const selectedProduct = products.find((p) => p.id === selectedProductId);
-  const calculatedTotal = selectedProduct ? selectedProduct.basePrice * qty : 0;
 
   const addToBucket = () => {
     if (!selectedProduct) return;
