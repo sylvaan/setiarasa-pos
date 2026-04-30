@@ -76,7 +76,7 @@ export const SideNavigation = ({
                     SetiaRasa
                   </Heading>
                   <Subheading className="!mt-2 !opacity-80">
-                    POS System Martabak V1.2.0
+                    POS System Martabak V1.3.0
                   </Subheading>
                 </div>
                 <Button
